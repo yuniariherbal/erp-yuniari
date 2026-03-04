@@ -95,8 +95,14 @@ export function KaryawanClient({ data }: { data: Karyawan[] }) {
                                 </div>
                                 <div className="grid grid-cols-2 gap-4">
                                     <div className="space-y-2">
-                                        <Label>Posisi</Label>
-                                        <Input name="posisi" defaultValue={editing?.posisi || ""} placeholder="Jabatan" />
+                                        <Label>Kategori / Role</Label>
+                                        <Select name="posisi" defaultValue={editing?.posisi || "Karyawan"}>
+                                            <SelectTrigger><SelectValue placeholder="Pilih Kategori" /></SelectTrigger>
+                                            <SelectContent>
+                                                <SelectItem value="Karyawan">Karyawan</SelectItem>
+                                                <SelectItem value="Chief">Chief</SelectItem>
+                                            </SelectContent>
+                                        </Select>
                                     </div>
                                     <div className="space-y-2">
                                         <Label>Status</Label>
