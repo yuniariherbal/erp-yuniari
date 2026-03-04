@@ -61,12 +61,6 @@ export default function LoginPage() {
                                 Masuk
                             </Button>
                         </form>
-                        <p className="mt-4 text-center text-sm text-muted-foreground">
-                            Belum punya akun?{" "}
-                            <Link href="/register" className="font-medium text-primary underline-offset-4 hover:underline">
-                                Daftar
-                            </Link>
-                        </p>
                     </CardContent>
                 </Card>
             </div>
