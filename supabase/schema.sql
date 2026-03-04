@@ -134,15 +134,41 @@ ALTER TABLE karyawan ENABLE ROW LEVEL SECURITY;
 ALTER TABLE produk ENABLE ROW LEVEL SECURITY;
 ALTER TABLE transaksi_detail ENABLE ROW LEVEL SECURITY;
 
--- Allow all operations for authenticated users
-CREATE POLICY "Authenticated users can do everything" ON pendapatan FOR ALL USING (auth.role() = 'authenticated');
-CREATE POLICY "Authenticated users can do everything" ON pengeluaran FOR ALL USING (auth.role() = 'authenticated');
-CREATE POLICY "Authenticated users can do everything" ON penggajian FOR ALL USING (auth.role() = 'authenticated');
-CREATE POLICY "Authenticated users can do everything" ON transaksi FOR ALL USING (auth.role() = 'authenticated');
-CREATE POLICY "Authenticated users can do everything" ON kategori FOR ALL USING (auth.role() = 'authenticated');
-CREATE POLICY "Authenticated users can do everything" ON karyawan FOR ALL USING (auth.role() = 'authenticated');
-CREATE POLICY "Authenticated users can do everything" ON produk FOR ALL USING (auth.role() = 'authenticated');
-CREATE POLICY "Authenticated users can do everything" ON transaksi_detail FOR ALL USING (auth.role() = 'authenticated');
+-- =============================================
+-- Row Level Security (RLS) POLICIES DENGAN ROLE
+-- =============================================
+-- Hapus policy lama jika sudah terlanjur dibuat:
+DROP POLICY IF EXISTS "Authenticated users can do everything" ON pendapatan;
+DROP POLICY IF EXISTS "Authenticated users can do everything" ON pengeluaran;
+DROP POLICY IF EXISTS "Authenticated users can do everything" ON penggajian;
+DROP POLICY IF EXISTS "Authenticated users can do everything" ON transaksi;
+DROP POLICY IF EXISTS "Authenticated users can do everything" ON kategori;
+DROP POLICY IF EXISTS "Authenticated users can do everything" ON karyawan;
+DROP POLICY IF EXISTS "Authenticated users can do everything" ON produk;
+DROP POLICY IF EXISTS "Authenticated users can do everything" ON transaksi_detail;
+
+-- 1. Master & Chief boleh melakukan APAPUN (Akses Penuh ke semua tabel)
+CREATE POLICY "Full access for Master and Chief" ON pendapatan FOR ALL USING (auth.jwt() -> 'user_metadata' ->> 'role' IN ('Master', 'Chief'));
+CREATE POLICY "Full access for Master and Chief" ON pengeluaran FOR ALL USING (auth.jwt() -> 'user_metadata' ->> 'role' IN ('Master', 'Chief'));
+CREATE POLICY "Full access for Master and Chief" ON penggajian FOR ALL USING (auth.jwt() -> 'user_metadata' ->> 'role' IN ('Master', 'Chief'));
+CREATE POLICY "Full access for Master and Chief" ON karyawan FOR ALL USING (auth.jwt() -> 'user_metadata' ->> 'role' IN ('Master', 'Chief'));
+CREATE POLICY "Full access for Master and Chief" ON kategori FOR ALL USING (auth.jwt() -> 'user_metadata' ->> 'role' IN ('Master', 'Chief'));
+CREATE POLICY "Full access for Master and Chief" ON produk FOR ALL USING (auth.jwt() -> 'user_metadata' ->> 'role' IN ('Master', 'Chief'));
+CREATE POLICY "Full access for Master and Chief" ON transaksi FOR ALL USING (auth.jwt() -> 'user_metadata' ->> 'role' IN ('Master', 'Chief'));
+CREATE POLICY "Full access for Master and Chief" ON transaksi_detail FOR ALL USING (auth.jwt() -> 'user_metadata' ->> 'role' IN ('Master', 'Chief'));
+
+-- 2. Karyawan HANYA bisa akses apa yang dibutuhkan untuk bekerja di POS / Dashboard
+-- Karyawan bisa bikin/lihat transaksi POS & Pendapatan Harian
+CREATE POLICY "Karyawan can view and create pendapatan" ON pendapatan FOR ALL USING (auth.jwt() -> 'user_metadata' ->> 'role' = 'Karyawan');
+CREATE POLICY "Karyawan can view and create transaksi" ON transaksi FOR ALL USING (auth.jwt() -> 'user_metadata' ->> 'role' = 'Karyawan');
+CREATE POLICY "Karyawan can view and create transaksi_detail" ON transaksi_detail FOR ALL USING (auth.jwt() -> 'user_metadata' ->> 'role' = 'Karyawan');
+
+-- Karyawan BISA Lihat (SELECT) dan Tambah (INSERT) Produk & Kategori (Hanya baca & tambah dari POS, tapi dilarang DELETE)
+CREATE POLICY "Karyawan access produk" ON produk FOR SELECT USING (auth.jwt() -> 'user_metadata' ->> 'role' = 'Karyawan');
+CREATE POLICY "Karyawan insert produk" ON produk FOR INSERT WITH CHECK (auth.jwt() -> 'user_metadata' ->> 'role' = 'Karyawan');
+CREATE POLICY "Karyawan update produk" ON produk FOR UPDATE USING (auth.jwt() -> 'user_metadata' ->> 'role' = 'Karyawan'); -- perlu update stok trx
+
+CREATE POLICY "Karyawan view kategori" ON kategori FOR SELECT USING (auth.jwt() -> 'user_metadata' ->> 'role' = 'Karyawan');
 
 -- =============================================
 -- Seed Data (Kategori defaults)
