@@ -20,7 +20,8 @@ export function PosClient({ produkList }: { produkList: Produk[] }) {
     const router = useRouter();
     const [search, setSearch] = useState("");
     const [cart, setCart] = useState<CartItem[]>([]);
-    const [diskon, setDiskon] = useState(0);
+    const [diskonType, setDiskonType] = useState<"nominal" | "persen">("nominal");
+    const [diskonValue, setDiskonValue] = useState(0);
     const [metodePembayaran, setMetodePembayaran] = useState("Cash");
     const [catatan, setCatatan] = useState("");
     const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
@@ -33,7 +34,8 @@ export function PosClient({ produkList }: { produkList: Produk[] }) {
     );
 
     const subtotal = cart.reduce((sum, item) => sum + item.subtotal, 0);
-    const total = subtotal - diskon;
+    const diskonNominal = diskonType === "nominal" ? diskonValue : (subtotal * diskonValue / 100);
+    const total = subtotal - diskonNominal;
 
     function addToCart(produk: Produk) {
         if (produk.stok <= 0) {
@@ -81,7 +83,7 @@ export function PosClient({ produkList }: { produkList: Produk[] }) {
     function clearCart() {
         if (confirm("Kosongkan keranjang?")) {
             setCart([]);
-            setDiskon(0);
+            setDiskonValue(0);
         }
     }
 
@@ -97,7 +99,7 @@ export function PosClient({ produkList }: { produkList: Produk[] }) {
             subtotal: c.subtotal,
         }));
 
-        const result = await createTransaksi(payload, diskon, metodePembayaran, catatan);
+        const result = await createTransaksi(payload, diskonNominal, diskonType === "persen" ? diskonValue : 0, metodePembayaran, catatan);
         setIsSubmitting(false);
 
         if (result.error) {
@@ -106,7 +108,7 @@ export function PosClient({ produkList }: { produkList: Produk[] }) {
             toast.success("Transaksi Berhasil");
             setSuccessTrx(result.nomor || "TRX-OK");
             setCart([]);
-            setDiskon(0);
+            setDiskonValue(0);
             setCatatan("");
             router.refresh();
         }
@@ -326,10 +328,10 @@ export function PosClient({ produkList }: { produkList: Produk[] }) {
                             <span>Subtotal ({cart.length} item)</span>
                             <span>{formatRupiah(subtotal)}</span>
                         </div>
-                        {diskon > 0 && (
+                        {diskonNominal > 0 && (
                             <div className="flex justify-between text-red-500">
-                                <span>Diskon</span>
-                                <span>-{formatRupiah(diskon)}</span>
+                                <span>Diskon {diskonType === "persen" && `(${diskonValue}%)`}</span>
+                                <span>-{formatRupiah(diskonNominal)}</span>
                             </div>
                         )}
                         <div className="flex justify-between font-bold text-lg pt-2 border-t border-dashed">
@@ -364,14 +366,25 @@ export function PosClient({ produkList }: { produkList: Produk[] }) {
 
                             <div className="space-y-4">
                                 <div className="space-y-2">
-                                    <Label>Diskon (Rp) opsional</Label>
-                                    <Input
-                                        type="number"
-                                        value={diskon}
-                                        onChange={(e) => setDiskon(Number(e.target.value) || 0)}
-                                        placeholder="0"
-                                        className="h-11 font-medium text-lg"
-                                    />
+                                    <Label>Diskon</Label>
+                                    <div className="flex gap-2">
+                                        <Select value={diskonType} onValueChange={(val: "nominal" | "persen") => setDiskonType(val)}>
+                                            <SelectTrigger className="w24 h-11">
+                                                <SelectValue />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <SelectItem value="nominal">Rp</SelectItem>
+                                                <SelectItem value="persen">%</SelectItem>
+                                            </SelectContent>
+                                        </Select>
+                                        <Input
+                                            type="number"
+                                            value={diskonValue}
+                                            onChange={(e) => setDiskonValue(Number(e.target.value) || 0)}
+                                            placeholder="0"
+                                            className="h-11 font-medium text-lg flex-1"
+                                        />
+                                    </div>
                                 </div>
 
                                 <div className="space-y-2">

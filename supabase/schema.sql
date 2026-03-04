@@ -95,6 +95,7 @@ CREATE TABLE IF NOT EXISTS transaksi (
     tanggal TIMESTAMPTZ DEFAULT NOW(),
     total DECIMAL(15,2) NOT NULL,
     diskon DECIMAL(15,2) DEFAULT 0,
+    diskon_persen DECIMAL(5,2) DEFAULT 0,
     total_bayar DECIMAL(15,2) NOT NULL,
     metode_pembayaran VARCHAR(50),
     catatan TEXT,

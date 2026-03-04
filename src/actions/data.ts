@@ -343,6 +343,7 @@ export async function getTransaksi(limit = 50) {
 export async function createTransaksi(
     items: { produk_id: string; nama_produk: string; harga: number; jumlah: number; subtotal: number }[],
     diskon: number,
+    diskon_persen: number,
     metode_pembayaran: string,
     catatan?: string
 ) {
@@ -360,6 +361,7 @@ export async function createTransaksi(
             nomor_transaksi: nomor,
             total,
             diskon,
+            diskon_persen,
             total_bayar,
             metode_pembayaran,
             catatan: catatan || null,

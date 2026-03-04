@@ -79,6 +79,7 @@ export type Transaksi = {
     tanggal: string;
     total: number;
     diskon: number;
+    diskon_persen?: number;
     total_bayar: number;
     metode_pembayaran: string | null;
     catatan: string | null;
