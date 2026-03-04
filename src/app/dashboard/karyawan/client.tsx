@@ -111,8 +111,8 @@ export function KaryawanClient({ data }: { data: Karyawan[] }) {
                                 </div>
                                 <div className="grid grid-cols-2 gap-4">
                                     <div className="space-y-2">
-                                        <Label>Gaji Pokok (Rp)</Label>
-                                        <Input type="number" name="gaji_pokok" defaultValue={editing?.gaji_pokok} placeholder="0" required />
+                                        <Label>Gaji Pokok (Bila Tetap, Rp)</Label>
+                                        <Input type="number" name="gaji_pokok" defaultValue={editing?.gaji_pokok || 0} placeholder="0" />
                                     </div>
                                     <div className="space-y-2">
                                         <Label>Tgl Bergabung</Label>
