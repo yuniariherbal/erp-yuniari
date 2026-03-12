@@ -50,8 +50,8 @@ export default function RegisterPage() {
                                 </div>
                             )}
                             <div className="space-y-2">
-                                <Label htmlFor="email">Email</Label>
-                                <Input id="email" name="email" type="email" placeholder="nama@email.com" required />
+                                <Label htmlFor="email">Email / Username</Label>
+                                <Input id="email" name="email" type="text" placeholder="nama@email.com atau username" required />
                             </div>
                             <div className="space-y-2">
                                 <Label htmlFor="password">Password</Label>

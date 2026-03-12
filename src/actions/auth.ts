@@ -5,8 +5,14 @@ import { redirect } from "next/navigation";
 
 export async function login(formData: FormData) {
     const supabase = await createClient();
+
+    let identifier = formData.get("email") as string;
+    if (identifier && !identifier.includes("@")) {
+        identifier = `${identifier}@erp.yuniari.com`;
+    }
+
     const { error } = await supabase.auth.signInWithPassword({
-        email: formData.get("email") as string,
+        email: identifier,
         password: formData.get("password") as string,
     });
 
@@ -28,8 +34,13 @@ export async function register(formData: FormData) {
     const protocol = host.includes("localhost") ? "http" : "https";
     const callbackUrl = `${protocol}://${host}/dashboard`;
 
+    let identifier = formData.get("email") as string;
+    if (identifier && !identifier.includes("@")) {
+        identifier = `${identifier}@erp.yuniari.com`;
+    }
+
     const { error } = await supabase.auth.signUp({
-        email: formData.get("email") as string,
+        email: identifier,
         password: formData.get("password") as string,
         options: {
             emailRedirectTo: callbackUrl,

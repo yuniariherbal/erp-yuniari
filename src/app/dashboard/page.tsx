@@ -4,8 +4,17 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { TrendingUp, TrendingDown, Wallet, Clock } from "lucide-react";
 import { DashboardChart } from "./chart";
+import { createClient } from "@/lib/supabase/server";
+import { redirect } from "next/navigation";
 
 export default async function DashboardPage() {
+    const supabase = await createClient();
+    const { data } = await supabase.auth.getUser();
+
+    if (data.user?.user_metadata?.role === "Karyawan") {
+        redirect("/dashboard/pos");
+    }
+
     const stats = await getDashboardStats();
 
     return (

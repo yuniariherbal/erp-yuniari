@@ -23,11 +23,11 @@ import { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
 
 const NAV_ITEMS = [
-    { href: "/dashboard", label: "Dashboard", icon: BarChart3 },
+    { href: "/dashboard", label: "Dashboard", icon: BarChart3, restricted: true },
     { href: "/dashboard/pendapatan", label: "Pendapatan", icon: TrendingUp },
     { href: "/dashboard/pengeluaran", label: "Pengeluaran", icon: TrendingDown },
     { href: "/dashboard/pos", label: "POS", icon: ShoppingCart },
-    { href: "/dashboard/produk", label: "Produk", icon: Package },
+    { href: "/dashboard/produk", label: "Produk", icon: Package, restricted: true },
     { href: "/dashboard/karyawan", label: "Karyawan", icon: Users, restricted: true },
     { href: "/dashboard/penggajian", label: "Penggajian", icon: Wallet, restricted: true },
     { href: "/dashboard/laporan", label: "Laporan", icon: FileSpreadsheet, restricted: true },
