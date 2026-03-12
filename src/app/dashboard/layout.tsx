@@ -45,9 +45,10 @@ function SidebarContent({ pathname, role, onLogout }: { pathname: string, role: 
     return (
         <div className="flex h-full flex-col">
             <div className="flex items-center gap-3 px-4 py-5">
-                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-zinc-900 dark:bg-zinc-50 overflow-hidden">
-                    <Image src="/favicon.png" alt="Herbal Yuniari Logo" width={64} height={64} className="h-full w-full object-cover" />
-                </div>
+                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-white overflow-hidden" />
+                <Image src="/favicon.png" alt="Herbal Yuniari Logo" width={64} height={64} className="h-full w-full object-cover" />
+            </div>
+            <div>
                 <div>
                     <p className="text-sm font-bold tracking-tight">ERP Yuniari</p>
                     <p className="text-xs text-muted-foreground">Mini ERP</p>
@@ -156,7 +157,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                     </SheetContent>
                 </Sheet>
                 <div className="flex items-center gap-2">
-                    <div className="h-6 w-6 rounded-md bg-zinc-900 dark:bg-zinc-50 overflow-hidden flex items-center justify-center">
+                    <div className="h-6 w-6 rounded-md bg-white overflow-hidden flex items-center justify-center">
                         <Image src="/favicon.png" alt="Logo" width={48} height={48} className="h-full w-full object-cover" />
                     </div>
                     <span className="font-bold text-sm">ERP Yuniari</span>

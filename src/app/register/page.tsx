@@ -29,7 +29,7 @@ export default function RegisterPage() {
         <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-zinc-50 via-zinc-100 to-zinc-200 dark:from-zinc-950 dark:via-zinc-900 dark:to-zinc-800 p-4">
             <div className="w-full max-w-md">
                 <div className="flex items-center justify-center gap-3 mb-8">
-                    <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-zinc-900 dark:bg-zinc-50 overflow-hidden">
+                    <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-white overflow-hidden">
                         <Image src="/favicon.png" alt="Herbal Yuniari Logo" width={100} height={100} className="h-full w-full object-cover" />
                     </div>
                     <div>

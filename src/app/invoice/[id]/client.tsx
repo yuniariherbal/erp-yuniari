@@ -31,7 +31,7 @@ export default function InvoiceClient({ transaksi }: { transaksi: TransaksiB2B &
             <div className="bg-white text-black p-10 w-full min-h-[297mm] shadow-lg print:shadow-none print:m-0 print:p-0 rounded-sm">
 
                 {/* Header */}
-                <div className="flex items-start justify-between border-b-2 border-zinc-900 pb-6 mb-8 mt-2">
+                <div className="flex items-start justify-between border-b-2 border-white pb-6 mb-8 mt-2">
                     <div className="flex items-center gap-4">
                         <Image src="/favicon.png" alt="Logo" width={64} height={64} className="rounded-md" />
                         <div>
@@ -81,15 +81,15 @@ export default function InvoiceClient({ transaksi }: { transaksi: TransaksiB2B &
                         <div className="bg-emerald-50/50 p-4 rounded-lg border border-emerald-100 flex justify-between items-center">
                             <span className="text-xs font-bold text-emerald-800/60 uppercase tracking-wider">Status Bayar</span>
                             <span className={`font-bold px-3 py-1 bg-white rounded-md border text-sm ${transaksi.status_pembayaran === "Lunas" ? "text-emerald-700 border-emerald-200" :
-                                    transaksi.status_pembayaran === "DP/Parsial" ? "text-amber-600 border-amber-200" :
-                                        "text-red-600 border-red-200"
+                                transaksi.status_pembayaran === "DP/Parsial" ? "text-amber-600 border-amber-200" :
+                                    "text-red-600 border-red-200"
                                 }`}>{transaksi.status_pembayaran}</span>
                         </div>
                         <div className="bg-blue-50/30 p-4 rounded-lg border border-blue-100 flex justify-between items-center">
                             <span className="text-xs font-bold text-blue-800/60 uppercase tracking-wider">Pengiriman</span>
                             <span className={`font-bold px-3 py-1 bg-white rounded-md border text-sm ${transaksi.status_pengiriman === 'Selesai' ? 'text-emerald-600 border-emerald-200' :
-                                    transaksi.status_pengiriman === 'Dikirim' ? 'text-blue-600 border-blue-200' :
-                                        'text-amber-600 border-amber-200'
+                                transaksi.status_pengiriman === 'Dikirim' ? 'text-blue-600 border-blue-200' :
+                                    'text-amber-600 border-amber-200'
                                 }`}>{transaksi.status_pengiriman}</span>
                         </div>
                     </div>
