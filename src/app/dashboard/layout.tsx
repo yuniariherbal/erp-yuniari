@@ -45,10 +45,9 @@ function SidebarContent({ pathname, role, onLogout }: { pathname: string, role: 
     return (
         <div className="flex h-full flex-col">
             <div className="flex items-center gap-3 px-4 py-5">
-                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-white overflow-hidden" />
-                <Image src="/favicon.png" alt="Herbal Yuniari Logo" width={64} height={64} className="h-full w-full object-cover" />
-            </div>
-            <div>
+                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-white overflow-hidden">
+                    <Image src="/favicon.png" alt="Herbal Yuniari Logo" width={64} height={64} className="h-full w-full object-cover" />
+                </div>
                 <div>
                     <p className="text-sm font-bold tracking-tight">ERP Yuniari</p>
                     <p className="text-xs text-muted-foreground">Mini ERP</p>
