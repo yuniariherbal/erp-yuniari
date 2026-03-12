@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import { Toaster } from "@/components/ui/sonner";
 import "./globals.css";
@@ -12,12 +12,15 @@ export const metadata: Metadata = {
   title: "ERP Yuniari",
   description: "Mini ERP - POS, Pendapatan, Pengeluaran, Penggajian",
   manifest: "/manifest.json",
-  themeColor: "#059669",
   appleWebApp: {
     capable: true,
     title: "ERP Yuniari",
     statusBarStyle: "default",
   },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#059669",
 };
 
 export default function RootLayout({

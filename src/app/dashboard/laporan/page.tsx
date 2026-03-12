@@ -21,7 +21,6 @@ export default async function LaporanPage() {
         <LaporanClient
             pendapatan={pendapatan || []}
             pengeluaran={pengeluaran || []}
-            kategori={kategori || []}
         />
     );
 }
