@@ -105,3 +105,54 @@ export type CartItem = {
     jumlah: number;
     subtotal: number;
 };
+
+export type Mitra = {
+    id: string;
+    nama: string;
+    kategori: "Reseller" | "Agen" | "Maklon" | null;
+    kontak_wa: string | null;
+    alamat: string | null;
+    created_at: string;
+    updated_at: string;
+};
+
+export type TransaksiB2B = {
+    id: string;
+    nomor_transaksi: string;
+    mitra_id: string | null;
+    tanggal: string;
+    total: number;
+    diskon: number;
+    ongkir: number;
+    total_tagihan: number;
+    jumlah_dibayar: number;
+    sisa_tagihan: number;
+    status_pembayaran: "Lunas" | "DP/Parsial" | "Belum Bayar";
+    status_pengiriman: "Diproses" | "Dikirim" | "Selesai";
+    jatuh_tempo: string | null;
+    metode_pembayaran: string | null;
+    catatan: string | null;
+    user_id: string;
+    created_at: string;
+    updated_at: string;
+    mitra?: Mitra;
+    transaksi_b2b_detail?: TransaksiB2BDetail[];
+};
+
+export type TransaksiB2BDetail = {
+    id: string;
+    transaksi_b2b_id: string;
+    produk_id: string | null;
+    nama_produk: string;
+    harga: number;
+    jumlah: number;
+    subtotal: number;
+};
+
+export type UserAuth = {
+    id: string;
+    email: string;
+    role: string;
+    last_sign_in_at: string | null;
+    created_at: string;
+};

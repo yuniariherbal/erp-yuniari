@@ -26,3 +26,23 @@ export async function createClient() {
         }
     );
 }
+
+// Client khusus Admin Bypass (TIDAK BOLEH dipakai sembarangan)
+export async function createAdminClient() {
+    // Tidak memakai auth token dari browser/cookies pengguna saat ini, 
+    // karena ini adalah hak dewa / bypass.
+    return createServerClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.SUPABASE_SERVICE_ROLE_KEY!,
+        {
+            cookies: {
+                getAll() {
+                    return [];
+                },
+                setAll() {
+                    // Do nothing for admin client
+                },
+            },
+        }
+    );
+}

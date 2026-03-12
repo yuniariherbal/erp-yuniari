@@ -122,6 +122,50 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+-- Mitra (B2B: Reseller, Agen, Maklon)
+CREATE TABLE IF NOT EXISTS mitra (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    nama VARCHAR(200) NOT NULL,
+    kategori VARCHAR(50) CHECK (kategori IN ('Reseller', 'Agen', 'Maklon')),
+    kontak_wa VARCHAR(20),
+    alamat TEXT,
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Transaksi B2B (Invoice / Konsinyasi)
+CREATE TABLE IF NOT EXISTS transaksi_b2b (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    nomor_transaksi VARCHAR(50) UNIQUE NOT NULL,
+    mitra_id UUID REFERENCES mitra(id) ON DELETE SET NULL,
+    tanggal TIMESTAMPTZ DEFAULT NOW(),
+    total DECIMAL(15,2) NOT NULL,
+    diskon DECIMAL(15,2) DEFAULT 0,
+    ongkir DECIMAL(15,2) DEFAULT 0,
+    total_tagihan DECIMAL(15,2) NOT NULL,
+    jumlah_dibayar DECIMAL(15,2) DEFAULT 0,
+    sisa_tagihan DECIMAL(15,2) DEFAULT 0,
+    status_pembayaran VARCHAR(20) DEFAULT 'Belum Bayar' CHECK (status_pembayaran IN ('Lunas', 'DP/Parsial', 'Belum Bayar')),
+    status_pengiriman VARCHAR(20) DEFAULT 'Diproses' CHECK (status_pengiriman IN ('Diproses', 'Dikirim', 'Selesai')),
+    jatuh_tempo DATE,
+    metode_pembayaran VARCHAR(50),
+    catatan TEXT,
+    user_id UUID REFERENCES auth.users(id),
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Detail Transaksi B2B
+CREATE TABLE IF NOT EXISTS transaksi_b2b_detail (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    transaksi_b2b_id UUID REFERENCES transaksi_b2b(id) ON DELETE CASCADE,
+    produk_id UUID REFERENCES produk(id) ON DELETE SET NULL,
+    nama_produk VARCHAR(200) NOT NULL,
+    harga DECIMAL(15,2) NOT NULL,
+    jumlah INTEGER NOT NULL,
+    subtotal DECIMAL(15,2) NOT NULL
+);
+
 -- =============================================
 -- Row Level Security (RLS)
 -- =============================================
@@ -134,6 +178,9 @@ ALTER TABLE kategori ENABLE ROW LEVEL SECURITY;
 ALTER TABLE karyawan ENABLE ROW LEVEL SECURITY;
 ALTER TABLE produk ENABLE ROW LEVEL SECURITY;
 ALTER TABLE transaksi_detail ENABLE ROW LEVEL SECURITY;
+ALTER TABLE mitra ENABLE ROW LEVEL SECURITY;
+ALTER TABLE transaksi_b2b ENABLE ROW LEVEL SECURITY;
+ALTER TABLE transaksi_b2b_detail ENABLE ROW LEVEL SECURITY;
 
 -- =============================================
 -- Row Level Security (RLS) POLICIES DENGAN ROLE
@@ -157,6 +204,9 @@ CREATE POLICY "Full access for Master and Chief" ON kategori FOR ALL USING (auth
 CREATE POLICY "Full access for Master and Chief" ON produk FOR ALL USING (auth.jwt() -> 'user_metadata' ->> 'role' IN ('Master', 'Chief'));
 CREATE POLICY "Full access for Master and Chief" ON transaksi FOR ALL USING (auth.jwt() -> 'user_metadata' ->> 'role' IN ('Master', 'Chief'));
 CREATE POLICY "Full access for Master and Chief" ON transaksi_detail FOR ALL USING (auth.jwt() -> 'user_metadata' ->> 'role' IN ('Master', 'Chief'));
+CREATE POLICY "Full access for Master and Chief" ON mitra FOR ALL USING (auth.jwt() -> 'user_metadata' ->> 'role' IN ('Master', 'Chief'));
+CREATE POLICY "Full access for Master and Chief" ON transaksi_b2b FOR ALL USING (auth.jwt() -> 'user_metadata' ->> 'role' IN ('Master', 'Chief'));
+CREATE POLICY "Full access for Master and Chief" ON transaksi_b2b_detail FOR ALL USING (auth.jwt() -> 'user_metadata' ->> 'role' IN ('Master', 'Chief'));
 
 -- 2. Karyawan HANYA bisa akses apa yang dibutuhkan untuk bekerja di POS / Dashboard
 -- Karyawan bisa bikin/lihat transaksi POS & Pendapatan Harian

@@ -1,6 +1,6 @@
 "use server";
 
-import { createClient } from "@/lib/supabase/server";
+import { createClient, createAdminClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
 
 // ========== KATEGORI ==========
@@ -494,4 +494,254 @@ export async function getDashboardStats() {
         penggajianPending: penggajianPending.data?.length || 0,
         chartData,
     };
+}
+
+// ========== MITRA (B2B) ==========
+export async function getMitra() {
+    const supabase = await createClient();
+    const { data, error } = await supabase
+        .from("mitra")
+        .select("*")
+        .order("nama", { ascending: true });
+    if (error) throw error;
+    return data;
+}
+
+export async function upsertMitra(formData: FormData) {
+    const supabase = await createClient();
+    const id = formData.get("id") as string | null;
+    const payload = {
+        nama: formData.get("nama") as string,
+        kategori: formData.get("kategori") as string,
+        kontak_wa: (formData.get("kontak_wa") as string) || null,
+        alamat: (formData.get("alamat") as string) || null,
+    };
+
+    if (id) {
+        const { error } = await supabase.from("mitra").update(payload).eq("id", id);
+        if (error) return { error: error.message };
+    } else {
+        const { error } = await supabase.from("mitra").insert(payload);
+        if (error) return { error: error.message };
+    }
+    revalidatePath("/dashboard/mitra");
+    return { success: true };
+}
+
+export async function deleteMitra(id: string) {
+    const supabase = await createClient();
+    const { error } = await supabase.from("mitra").delete().eq("id", id);
+    if (error) return { error: error.message };
+    revalidatePath("/dashboard/mitra");
+    return { success: true };
+}
+
+// ========== TRANSAKSI B2B ==========
+export async function getTransaksiB2B(limit = 50) {
+    const supabase = await createClient();
+    const { data, error } = await supabase
+        .from("transaksi_b2b")
+        .select("*, mitra(*)")
+        .order("tanggal", { ascending: false })
+        .limit(limit);
+    if (error) throw error;
+    return data;
+}
+
+export async function getTransaksiB2BById(idOrNomor: string) {
+    const supabase = await createClient();
+    let query = supabase.from("transaksi_b2b").select("*, mitra(*), transaksi_b2b_detail(*)");
+
+    const isId = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(idOrNomor);
+    if (isId) {
+        query = query.eq("id", idOrNomor);
+    } else {
+        query = query.eq("nomor_transaksi", idOrNomor);
+    }
+
+    const { data, error } = await query.single();
+    if (error) return null;
+    return data;
+}
+
+export async function createTransaksiB2B(
+    mitra_id: string,
+    items: { produk_id: string; nama_produk: string; harga: number; jumlah: number; subtotal: number }[],
+    diskon: number,
+    ongkir: number,
+    jumlah_dibayar: number,
+    status_pengiriman: string,
+    jatuh_tempo: string | null,
+    metode_pembayaran: string,
+    catatan?: string
+) {
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return { error: "Unauthorized" };
+
+    const total = items.reduce((sum, item) => sum + item.subtotal, 0);
+    const total_tagihan = total + ongkir - diskon;
+    const sisa_tagihan = total_tagihan - jumlah_dibayar;
+
+    let status_pembayaran = "Belum Bayar";
+    if (jumlah_dibayar >= total_tagihan) {
+        status_pembayaran = "Lunas";
+    } else if (jumlah_dibayar > 0) {
+        status_pembayaran = "DP/Parsial";
+    }
+
+    const nomor = `INV-${Date.now()}`;
+
+    const { data: trx, error: trxError } = await supabase
+        .from("transaksi_b2b")
+        .insert({
+            nomor_transaksi: nomor,
+            mitra_id,
+            total,
+            diskon,
+            ongkir,
+            total_tagihan,
+            jumlah_dibayar,
+            sisa_tagihan,
+            status_pembayaran,
+            status_pengiriman,
+            jatuh_tempo,
+            metode_pembayaran,
+            catatan: catatan || null,
+            user_id: user.id,
+        })
+        .select()
+        .single();
+
+    if (trxError) return { error: trxError.message };
+
+    const details = items.map((item) => ({
+        transaksi_b2b_id: trx.id,
+        ...item,
+    }));
+
+    const { error: detailError } = await supabase.from("transaksi_b2b_detail").insert(details);
+    if (detailError) return { error: detailError.message };
+
+    // Update stok
+    for (const item of items) {
+        await supabase.rpc("decrement_stok", { p_id: item.produk_id, p_jumlah: item.jumlah });
+    }
+
+    // Only record pendapatan for the amount actually paid right now
+    if (jumlah_dibayar > 0) {
+        await supabase.from("pendapatan").insert({
+            tanggal: new Date().toISOString().split("T")[0],
+            deskripsi: `DP/Payment Invoice ${nomor}`,
+            jumlah: jumlah_dibayar,
+            metode_pembayaran,
+            catatan: `Pembayaran B2B Mitra ID: ${mitra_id}`,
+            user_id: user.id,
+        });
+    }
+
+    revalidatePath("/pos-b2b");
+    revalidatePath("/pendapatan");
+    revalidatePath("/dashboard");
+    return { success: true, nomor };
+}
+
+
+// ========== AUTH / USER MANAGEMENT (ADMIN ONLY) ==========
+
+export async function getAuthUsers() {
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+
+    // Pastikan cuma Master yang bisa akses
+    if (user?.user_metadata?.role !== "Master") {
+        return { error: "Akses Ditolak. Harus Master." };
+    }
+
+    // Panggil Service Role / Admin Client
+    const adminAuthClient = await createAdminClient();
+    const { data: users, error } = await adminAuthClient.auth.admin.listUsers();
+
+    if (error) return { error: error.message };
+
+    const mapped = users.users.map(u => ({
+        id: u.id,
+        email: u.email || "",
+        role: u.user_metadata?.role || "Karyawan",
+        last_sign_in_at: u.last_sign_in_at || null,
+        created_at: u.created_at
+    }));
+
+    return { data: mapped };
+}
+
+export async function createAuthUser(formData: FormData) {
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (user?.user_metadata?.role !== "Master") {
+        return { error: "Akses Ditolak." };
+    }
+
+    const email = formData.get("email") as string;
+    const password = formData.get("password") as string;
+    const role = formData.get("role") as string;
+
+    const adminAuthClient = await createAdminClient();
+
+    // Auto confirm dan sign up lewat backend
+    const { error } = await adminAuthClient.auth.admin.createUser({
+        email: email,
+        password: password,
+        email_confirm: true,
+        user_metadata: { role: role }
+    });
+
+    if (error) return { error: error.message };
+
+    revalidatePath("/dashboard/akun");
+    return { success: true };
+}
+
+export async function resetUserPassword(userId: string, formData: FormData) {
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (user?.user_metadata?.role !== "Master") {
+        return { error: "Akses Ditolak." };
+    }
+
+    const newPassword = formData.get("password") as string;
+    const adminAuthClient = await createAdminClient();
+
+    const { error } = await adminAuthClient.auth.admin.updateUserById(
+        userId,
+        { password: newPassword }
+    );
+
+    if (error) return { error: error.message };
+
+    return { success: true };
+}
+
+export async function deleteAuthUser(userId: string) {
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (user?.user_metadata?.role !== "Master") {
+        return { error: "Akses Ditolak." };
+    }
+
+    // Cegah hapus diri sendiri dari dashboard ini (Miskilik bahaya)
+    if (user?.id === userId) {
+        return { error: "Tidak dapat menghapus akun Anda sendiri!" };
+    }
+
+    const adminAuthClient = await createAdminClient();
+    const { error } = await adminAuthClient.auth.admin.deleteUser(userId);
+
+    if (error) return { error: error.message };
+
+    revalidatePath("/dashboard/akun");
+    return { success: true };
 }

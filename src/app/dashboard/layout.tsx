@@ -20,6 +20,9 @@ import {
     Menu,
     Package,
     Loader2,
+    Truck,
+    Briefcase,
+    Lock,
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
@@ -28,11 +31,14 @@ const NAV_ITEMS = [
     { href: "/dashboard", label: "Dashboard", icon: BarChart3, restricted: true },
     { href: "/dashboard/pendapatan", label: "Pendapatan", icon: TrendingUp },
     { href: "/dashboard/pengeluaran", label: "Pengeluaran", icon: TrendingDown },
-    { href: "/dashboard/pos", label: "POS", icon: ShoppingCart },
+    { href: "/dashboard/pos", label: "POS Kasir", icon: ShoppingCart },
+    { href: "/dashboard/pos-b2b", label: "POS Invoice (B2B)", icon: Truck, restricted: true },
     { href: "/dashboard/produk", label: "Produk", icon: Package, restricted: true },
+    { href: "/dashboard/mitra", label: "Mitra / Agen", icon: Briefcase, restricted: true },
     { href: "/dashboard/karyawan", label: "Karyawan", icon: Users, restricted: true },
     { href: "/dashboard/penggajian", label: "Penggajian", icon: Wallet, restricted: true },
     { href: "/dashboard/laporan", label: "Laporan", icon: FileSpreadsheet, restricted: true },
+    { href: "/dashboard/akun", label: "Manage Akun", icon: Lock, masterOnly: true },
 ];
 
 function SidebarContent({ pathname, role, onLogout }: { pathname: string, role: string, onLogout?: () => void }) {
@@ -54,6 +60,7 @@ function SidebarContent({ pathname, role, onLogout }: { pathname: string, role: 
                 {NAV_ITEMS.map((item) => {
                     const isActive = pathname === item.href;
                     if (item.restricted && role === "Karyawan") return null;
+                    if (item.masterOnly && role !== "Master") return null;
 
                     return (
                         <Link

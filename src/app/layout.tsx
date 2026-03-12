@@ -11,6 +11,13 @@ const inter = Inter({
 export const metadata: Metadata = {
   title: "ERP Yuniari",
   description: "Mini ERP - POS, Pendapatan, Pengeluaran, Penggajian",
+  manifest: "/manifest.json",
+  themeColor: "#059669",
+  appleWebApp: {
+    capable: true,
+    title: "ERP Yuniari",
+    statusBarStyle: "default",
+  },
 };
 
 export default function RootLayout({
@@ -23,6 +30,26 @@ export default function RootLayout({
       <body className={`${inter.variable} font-sans antialiased`}>
         {children}
         <Toaster richColors position="top-right" />
+
+        {/* Service Worker Registration */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              if ('serviceWorker' in navigator) {
+                window.addEventListener('load', function() {
+                  navigator.serviceWorker.register('/sw.js').then(
+                    function(registration) {
+                      console.log('ServiceWorker registration successful');
+                    },
+                    function(err) {
+                      console.log('ServiceWorker registration failed: ', err);
+                    }
+                  );
+                });
+              }
+            `,
+          }}
+        />
       </body>
     </html>
   );
