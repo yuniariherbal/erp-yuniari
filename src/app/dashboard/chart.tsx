@@ -29,7 +29,7 @@ export function DashboardChart({ data }: { data: ChartData[] }) {
                     tickFormatter={(v) => `${(v / 1_000_000).toFixed(0)}jt`}
                 />
                 <Tooltip
-                    formatter={(value: any) => formatRupiah(Number(value))}
+                    formatter={(value: number | undefined) => formatRupiah(Number(value || 0))}
                     contentStyle={{
                         borderRadius: "8px",
                         border: "none",

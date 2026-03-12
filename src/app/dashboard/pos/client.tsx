@@ -7,9 +7,7 @@ import type { Produk, CartItem } from "@/lib/types";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Plus, Minus, Search, ShoppingCart, Trash2, Receipt, Package } from "lucide-react";
 import { toast } from "sonner";
@@ -253,7 +251,7 @@ export function PosClient({ produkList }: { produkList: Produk[] }) {
                             ))}
                             {filteredProduk.length === 0 && search && (
                                 <div className="col-span-full py-10 text-center text-muted-foreground">
-                                    Pencarian "{search}" tidak ditemukan
+                                    Pencarian &quot;{search}&quot; tidak ditemukan
                                 </div>
                             )}
                         </div>

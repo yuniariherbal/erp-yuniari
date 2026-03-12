@@ -3,21 +3,19 @@
 import { useState } from "react";
 import { formatRupiah, MONTHS } from "@/lib/format";
 import { exportToExcel } from "@/lib/export";
-import type { Pendapatan, Pengeluaran, Kategori } from "@/lib/types";
+import type { Pendapatan, Pengeluaran } from "@/lib/types";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { FileSpreadsheet, Download, RefreshCw, BarChart4, Plus, Minus } from "lucide-react";
+import { Download, BarChart4, Plus, Minus } from "lucide-react";
 
 export function LaporanClient({
     pendapatan,
     pengeluaran,
-    kategori,
 }: {
     pendapatan: Pendapatan[];
     pengeluaran: Pengeluaran[];
-    kategori: Kategori[];
 }) {
     const currentMonth = new Date().getMonth() + 1;
     const currentYear = new Date().getFullYear();

@@ -1,19 +1,22 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { login } from "@/actions/auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import Link from "next/link";
-import { Loader2, BarChart3 } from "lucide-react";
+import { Loader2 } from "lucide-react";
 
 export default function LoginPage() {
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
+    const [username, setUsername] = useState("");
 
     async function handleSubmit(formData: FormData) {
+        const emailStr = formData.get("email") as string;
+        if (emailStr) setUsername(emailStr.split('@')[0]);
         setLoading(true);
         setError("");
         const result = await login(formData);
@@ -23,12 +26,24 @@ export default function LoginPage() {
         }
     }
 
+    if (loading && !error) {
+        return (
+            <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-zinc-50 dark:bg-zinc-950">
+                <Loader2 className="h-12 w-12 animate-spin text-emerald-600 mb-6" />
+                <h2 className="text-3xl font-bold animate-pulse text-zinc-900 dark:text-zinc-50">
+                    Selamat Datang, {username}!
+                </h2>
+                <p className="text-muted-foreground mt-2 font-medium">Memuat sistem ERP...</p>
+            </div>
+        );
+    }
+
     return (
         <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-zinc-50 via-zinc-100 to-zinc-200 dark:from-zinc-950 dark:via-zinc-900 dark:to-zinc-800 p-4">
             <div className="w-full max-w-md">
                 <div className="flex items-center justify-center gap-3 mb-8">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-zinc-900 dark:bg-zinc-50">
-                        <BarChart3 className="h-6 w-6 text-zinc-50 dark:text-zinc-900" />
+                    <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-zinc-900 dark:bg-zinc-50 overflow-hidden">
+                        <Image src="/favicon.png" alt="Herbal Yuniari Logo" width={100} height={100} className="h-full w-full object-cover" />
                     </div>
                     <div>
                         <h1 className="text-2xl font-bold tracking-tight">ERP Yuniari</h1>

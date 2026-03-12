@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { logout } from "@/actions/auth";
 import { cn } from "@/lib/utils";
@@ -18,6 +19,7 @@ import {
     LogOut,
     Menu,
     Package,
+    Loader2,
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
@@ -33,12 +35,12 @@ const NAV_ITEMS = [
     { href: "/dashboard/laporan", label: "Laporan", icon: FileSpreadsheet, restricted: true },
 ];
 
-function SidebarContent({ pathname, role }: { pathname: string, role: string }) {
+function SidebarContent({ pathname, role, onLogout }: { pathname: string, role: string, onLogout?: () => void }) {
     return (
         <div className="flex h-full flex-col">
             <div className="flex items-center gap-3 px-4 py-5">
-                <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-zinc-900 dark:bg-zinc-50">
-                    <BarChart3 className="h-5 w-5 text-zinc-50 dark:text-zinc-900" />
+                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-zinc-900 dark:bg-zinc-50 overflow-hidden">
+                    <Image src="/favicon.png" alt="Herbal Yuniari Logo" width={64} height={64} className="h-full w-full object-cover" />
                 </div>
                 <div>
                     <p className="text-sm font-bold tracking-tight">ERP Yuniari</p>
@@ -75,7 +77,10 @@ function SidebarContent({ pathname, role }: { pathname: string, role: string }) 
             <Separator />
 
             <div className="p-3">
-                <form action={logout}>
+                <form action={async () => {
+                    if (onLogout) onLogout();
+                    await logout();
+                }}>
                     <Button variant="ghost" className="w-full justify-start gap-3 text-muted-foreground hover:text-destructive" type="submit">
                         <LogOut className="h-4 w-4" />
                         Keluar
@@ -90,23 +95,42 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     const pathname = usePathname();
     const [open, setOpen] = useState(false);
     const [role, setRole] = useState<string>("Karyawan");
+    const [email, setEmail] = useState<string>("Admin");
+    const [isLoggingOut, setIsLoggingOut] = useState(false);
 
     useEffect(() => {
-        const getRole = async () => {
+        const getSessionData = async () => {
             const supabase = createClient();
             const { data } = await supabase.auth.getUser();
-            if (data.user?.user_metadata?.role) {
-                setRole(data.user.user_metadata.role);
+            if (data.user) {
+                if (data.user.user_metadata?.role) {
+                    setRole(data.user.user_metadata.role);
+                }
+                if (data.user.email) {
+                    setEmail(data.user.email.split('@')[0]);
+                }
             }
         };
-        getRole();
+        getSessionData();
     }, []);
+
+    if (isLoggingOut) {
+        return (
+            <div className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-zinc-50 dark:bg-zinc-950">
+                <Loader2 className="h-12 w-12 animate-spin text-emerald-600 mb-6" />
+                <h2 className="text-3xl font-bold animate-pulse text-zinc-900 dark:text-zinc-50">
+                    Terima Kasih, {email}!
+                </h2>
+                <p className="text-muted-foreground mt-2 font-medium">Sedang keluar dari sistem...</p>
+            </div>
+        );
+    }
 
     return (
         <div className="flex min-h-screen bg-zinc-50/50 dark:bg-zinc-950">
             {/* Desktop sidebar */}
             <aside className="hidden lg:flex lg:w-60 lg:flex-col lg:border-r bg-white dark:bg-zinc-900 fixed inset-y-0 z-30">
-                <SidebarContent pathname={pathname} role={role} />
+                <SidebarContent pathname={pathname} role={role} onLogout={() => setIsLoggingOut(true)} />
             </aside>
 
             {/* Mobile header */}
@@ -120,19 +144,21 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                     <SheetContent side="left" className="w-60 p-0">
                         <SheetTitle className="sr-only">Menu Navigasi</SheetTitle>
                         <div onClick={() => setOpen(false)}>
-                            <SidebarContent pathname={pathname} role={role} />
+                            <SidebarContent pathname={pathname} role={role} onLogout={() => setIsLoggingOut(true)} />
                         </div>
                     </SheetContent>
                 </Sheet>
                 <div className="flex items-center gap-2">
-                    <BarChart3 className="h-5 w-5" />
+                    <div className="h-6 w-6 rounded-md bg-zinc-900 dark:bg-zinc-50 overflow-hidden flex items-center justify-center">
+                        <Image src="/favicon.png" alt="Logo" width={48} height={48} className="h-full w-full object-cover" />
+                    </div>
                     <span className="font-bold text-sm">ERP Yuniari</span>
                 </div>
             </div>
 
             {/* Main content */}
             <main className="flex-1 lg:ml-60">
-                <div className="p-4 pt-18 lg:p-8 lg:pt-8">
+                <div className="p-4 pt-18 lg:p-8 lg:pt-8:">
                     {children}
                 </div>
             </main>
