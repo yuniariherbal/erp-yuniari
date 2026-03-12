@@ -57,6 +57,7 @@ function SidebarContent({ pathname, role }: { pathname: string, role: string }) 
                         <Link
                             key={item.href}
                             href={item.href}
+                            prefetch={true}
                             className={cn(
                                 "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-150",
                                 isActive

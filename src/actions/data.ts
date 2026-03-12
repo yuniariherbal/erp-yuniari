@@ -438,29 +438,32 @@ export async function getDashboardStats() {
     const totalPengeluaran = (pengeluaran.data || []).reduce((sum, r) => sum + r.jumlah, 0);
 
     // Get monthly data for chart (last 6 months)
+    const sixMonthsAgoD = new Date(tahunIni, bulanIni - 6, 1);
+    const sixMonthsAgoS = `${sixMonthsAgoD.getFullYear()}-${String(sixMonthsAgoD.getMonth() + 1).padStart(2, "0")}-01`;
+
+    const [allP, allK] = await Promise.all([
+        supabase.from("pendapatan").select("jumlah, tanggal").gte("tanggal", sixMonthsAgoS).lt("tanggal", endDate),
+        supabase.from("pengeluaran").select("jumlah, tanggal").gte("tanggal", sixMonthsAgoS).lt("tanggal", endDate),
+    ]);
+
     const chartData = [];
+    const MONTHS_SHORT = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agu", "Sep", "Okt", "Nov", "Des"];
+
     for (let i = 5; i >= 0; i--) {
         const d = new Date(tahunIni, bulanIni - 1 - i, 1);
         const m = d.getMonth() + 1;
         const y = d.getFullYear();
-        const s = `${y}-${String(m).padStart(2, "0")}-01`;
-        const em = m === 12 ? 1 : m + 1;
-        const ey = m === 12 ? y + 1 : y;
-        const e = `${ey}-${String(em).padStart(2, "0")}-01`;
+        const s = `${y}-${String(m).padStart(2, "0")}`; // YYYY-MM
 
-        const [p, k] = await Promise.all([
-            supabase.from("pendapatan").select("jumlah").gte("tanggal", s).lt("tanggal", e),
-            supabase.from("pengeluaran").select("jumlah").gte("tanggal", s).lt("tanggal", e),
-        ]);
+        const pFiltered = (allP.data || []).filter(r => r.tanggal.startsWith(s));
+        const kFiltered = (allK.data || []).filter(r => r.tanggal.startsWith(s));
 
-        const MONTHS_SHORT = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agu", "Sep", "Okt", "Nov", "Des"];
         chartData.push({
             bulan: MONTHS_SHORT[m - 1],
-            pendapatan: (p.data || []).reduce((sum, r) => sum + r.jumlah, 0),
-            pengeluaran: (k.data || []).reduce((sum, r) => sum + r.jumlah, 0),
+            pendapatan: pFiltered.reduce((sum, r) => sum + r.jumlah, 0),
+            pengeluaran: kFiltered.reduce((sum, r) => sum + r.jumlah, 0),
         });
     }
-
     return {
         totalPendapatan,
         totalPengeluaran,
