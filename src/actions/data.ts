@@ -340,6 +340,28 @@ export async function getTransaksi(limit = 50) {
     return data;
 }
 
+export async function getTransaksiById(idOrNomor: string) {
+    const supabase = await createClient();
+    // Try by ID first, then by nomor_transaksi
+    let query = supabase.from("transaksi").select("*, transaksi_detail(*)");
+
+    // Check if it looks like a UUID
+    const isId = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(idOrNomor);
+
+    if (isId) {
+        query = query.eq("id", idOrNomor);
+    } else {
+        query = query.eq("nomor_transaksi", idOrNomor);
+    }
+
+    const { data, error } = await query.single();
+    if (error) {
+        console.error("Error getTransaksiById:", error);
+        return null;
+    }
+    return data;
+}
+
 export async function createTransaksi(
     items: { produk_id: string; nama_produk: string; harga: number; jumlah: number; subtotal: number }[],
     diskon: number,

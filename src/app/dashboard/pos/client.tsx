@@ -432,8 +432,7 @@ export function PosClient({ produkList }: { produkList: Produk[] }) {
                                 </p>
                             </div>
                             <div className="w-full flex gap-3 pt-4 border-t">
-                                {/* Cetak Struk is just visual for this demo, usually calls window.print() on a specific receipt route */}
-                                <Button variant="outline" className="flex-1" onClick={() => toast("Fitur cetak akan diintegrasikan dengan printer thermal")}>
+                                <Button variant="outline" className="flex-1" onClick={() => window.open(`/struk/${successTrx}`, "_blank")}>
                                     <Receipt className="mr-2 h-4 w-4" /> Cetak Struk
                                 </Button>
                                 <Button className="flex-1" onClick={resetNewTransaction}>
