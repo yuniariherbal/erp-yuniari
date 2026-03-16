@@ -150,6 +150,7 @@ CREATE TABLE IF NOT EXISTS transaksi_b2b (
     jatuh_tempo DATE,
     metode_pembayaran VARCHAR(50),
     catatan TEXT,
+    nominal_retur DECIMAL(15,2) DEFAULT 0,
     user_id UUID REFERENCES auth.users(id),
     created_at TIMESTAMPTZ DEFAULT NOW(),
     updated_at TIMESTAMPTZ DEFAULT NOW()
@@ -235,4 +236,33 @@ INSERT INTO kategori (nama, tipe) VALUES
     ('Utilitas', 'pengeluaran'),
     ('Perlengkapan', 'pengeluaran'),
     ('Lainnya', 'pengeluaran')
-ON CONFLICT DO NOTHING;
+-- =============================================
+-- Performance Optimization (Indexes)
+-- =============================================
+
+-- Transaksi B2B & Tagihan
+CREATE INDEX IF NOT EXISTS idx_transaksi_b2b_mitra_id ON transaksi_b2b(mitra_id);
+CREATE INDEX IF NOT EXISTS idx_transaksi_b2b_tanggal ON transaksi_b2b(tanggal DESC);
+CREATE INDEX IF NOT EXISTS idx_transaksi_b2b_status ON transaksi_b2b(status_pembayaran);
+CREATE INDEX IF NOT EXISTS idx_transaksi_b2b_sisa ON transaksi_b2b(sisa_tagihan) WHERE sisa_tagihan > 0;
+
+-- Transaksi POS
+CREATE INDEX IF NOT EXISTS idx_transaksi_tanggal ON transaksi(tanggal DESC);
+
+-- Details (FKs)
+CREATE INDEX IF NOT EXISTS idx_transaksi_detail_transaksi_id ON transaksi_detail(transaksi_id);
+CREATE INDEX IF NOT EXISTS idx_transaksi_b2b_detail_b2b_id ON transaksi_b2b_detail(transaksi_b2b_id);
+
+-- Finance
+CREATE INDEX IF NOT EXISTS idx_pendapatan_tanggal ON pendapatan(tanggal DESC);
+CREATE INDEX IF NOT EXISTS idx_pengeluaran_tanggal ON pengeluaran(tanggal DESC);
+CREATE INDEX IF NOT EXISTS idx_pendapatan_kategori ON pendapatan(kategori_id);
+CREATE INDEX IF NOT EXISTS idx_pengeluaran_kategori ON pengeluaran(kategori_id);
+
+-- HR
+CREATE INDEX IF NOT EXISTS idx_penggajian_karyawan ON penggajian(karyawan_id);
+
+-- Produk
+CREATE INDEX IF NOT EXISTS idx_produk_nama ON produk(nama);
+CREATE INDEX IF NOT EXISTS idx_produk_active ON produk(is_active);
+

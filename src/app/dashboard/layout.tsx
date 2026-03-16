@@ -23,6 +23,7 @@ import {
     Truck,
     Briefcase,
     Lock,
+    Receipt,
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
@@ -35,6 +36,7 @@ const NAV_ITEMS = [
     { href: "/dashboard/pos-b2b", label: "POS Invoice (B2B)", icon: Truck, restricted: true },
     { href: "/dashboard/produk", label: "Produk", icon: Package, restricted: true },
     { href: "/dashboard/mitra", label: "Mitra / Agen", icon: Briefcase, restricted: true },
+    { href: "/dashboard/tagihan", label: "Data Tagihan", icon: Receipt, restricted: true },
     { href: "/dashboard/karyawan", label: "Karyawan", icon: Users, restricted: true },
     { href: "/dashboard/penggajian", label: "Penggajian", icon: Wallet, restricted: true },
     { href: "/dashboard/laporan", label: "Laporan", icon: FileSpreadsheet, restricted: true },

@@ -132,6 +132,7 @@ export type TransaksiB2B = {
     jatuh_tempo: string | null;
     metode_pembayaran: string | null;
     catatan: string | null;
+    nominal_retur: number;
     user_id: string;
     created_at: string;
     updated_at: string;

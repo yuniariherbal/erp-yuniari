@@ -537,13 +537,18 @@ export async function deleteMitra(id: string) {
 }
 
 // ========== TRANSAKSI B2B ==========
-export async function getTransaksiB2B(limit = 50) {
+export async function getTransaksiB2B(mitraId?: string, limit = 100) {
     const supabase = await createClient();
-    const { data, error } = await supabase
+    let query = supabase
         .from("transaksi_b2b")
         .select("*, mitra(*)")
-        .order("tanggal", { ascending: false })
-        .limit(limit);
+        .order("tanggal", { ascending: false });
+
+    if (mitraId) {
+        query = query.eq("mitra_id", mitraId);
+    }
+
+    const { data, error } = await query.limit(limit);
     if (error) throw error;
     return data;
 }
@@ -608,6 +613,7 @@ export async function createTransaksiB2B(
             jatuh_tempo,
             metode_pembayaran,
             catatan: catatan || null,
+            nominal_retur: 0,
             user_id: user.id,
         })
         .select()
@@ -640,10 +646,47 @@ export async function createTransaksiB2B(
         });
     }
 
-    revalidatePath("/pos-b2b");
-    revalidatePath("/pendapatan");
+    revalidatePath("/dashboard/tagihan");
+    revalidatePath("/dashboard/pos-b2b");
+    revalidatePath("/dashboard/pendapatan");
     revalidatePath("/dashboard");
     return { success: true, nomor };
+}
+
+export async function updateTransaksiB2B(formData: FormData) {
+    const supabase = await createClient();
+    const id = formData.get("id") as string;
+    const jumlah_dibayar = Number(formData.get("jumlah_dibayar") || 0);
+    const nominal_retur = Number(formData.get("nominal_retur") || 0);
+    const total_tagihan = Number(formData.get("total_tagihan") || 0);
+    const catatan = formData.get("catatan") as string;
+
+    const sisa_tagihan = total_tagihan - jumlah_dibayar - nominal_retur;
+    let status_pembayaran = "Belum Bayar";
+    if (sisa_tagihan <= 0) {
+        status_pembayaran = "Lunas";
+    } else if (jumlah_dibayar > 0) {
+        status_pembayaran = "DP/Parsial";
+    }
+
+    const { error } = await supabase
+        .from("transaksi_b2b")
+        .update({
+            jumlah_dibayar,
+            nominal_retur,
+            sisa_tagihan,
+            status_pembayaran,
+            catatan,
+            updated_at: new Date().toISOString(),
+        })
+        .eq("id", id);
+
+    if (error) return { error: error.message };
+
+    revalidatePath("/dashboard/tagihan");
+    revalidatePath("/dashboard/pos-b2b");
+    revalidatePath("/dashboard/mitra");
+    return { success: true };
 }
 
 

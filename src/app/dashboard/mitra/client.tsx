@@ -12,9 +12,10 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Download, Trash2, Pencil } from "lucide-react";
+import { Plus, Download, Trash2, Pencil, FileText } from "lucide-react";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 export function MitraClient({ data }: { data: Mitra[] }) {
     const router = useRouter();
@@ -112,24 +113,37 @@ export function MitraClient({ data }: { data: Mitra[] }) {
                     <Table>
                         <TableHeader>
                             <TableRow>
+                                <TableHead className="w-[100px]">ID Mitra</TableHead>
                                 <TableHead>Nama Mitra</TableHead>
                                 <TableHead>Kategori</TableHead>
                                 <TableHead>Kontak WA</TableHead>
                                 <TableHead>Alamat</TableHead>
-                                <TableHead className="w-[80px]"></TableHead>
+                                <TableHead className="w-[100px]"></TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
                             {data.length === 0 ? (
                                 <TableRow>
-                                    <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
+                                    <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
                                         Belum ada data mitra
                                     </TableCell>
                                 </TableRow>
                             ) : (
                                 data.map((d) => (
                                     <TableRow key={d.id}>
-                                        <TableCell className="font-medium">{d.nama}</TableCell>
+                                        <TableCell>
+                                            <Link
+                                                href={`/dashboard/tagihan?mitraId=${d.id}`}
+                                                className="text-[10px] font-mono bg-zinc-100 dark:bg-zinc-800 px-1.5 py-0.5 rounded hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors"
+                                            >
+                                                {d.id.slice(0, 8)}...
+                                            </Link>
+                                        </TableCell>
+                                        <TableCell className="font-medium">
+                                            <Link href={`/dashboard/tagihan?mitraId=${d.id}`} className="hover:underline">
+                                                {d.nama}
+                                            </Link>
+                                        </TableCell>
                                         <TableCell>
                                             <Badge variant={
                                                 d.kategori === "Maklon" ? "destructive" :
@@ -142,6 +156,11 @@ export function MitraClient({ data }: { data: Mitra[] }) {
                                         <TableCell className="text-sm text-muted-foreground">{d.alamat || "-"}</TableCell>
                                         <TableCell>
                                             <div className="flex gap-1">
+                                                <Button variant="ghost" size="icon" className="h-7 w-7" asChild title="Lihat Tagihan">
+                                                    <Link href={`/dashboard/tagihan?mitraId=${d.id}`}>
+                                                        <FileText className="h-3.5 w-3.5" />
+                                                    </Link>
+                                                </Button>
                                                 <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => { setEditing(d); setOpen(true); }}>
                                                     <Pencil className="h-3.5 w-3.5" />
                                                 </Button>
