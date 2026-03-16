@@ -4,7 +4,7 @@ import { createClient, createAdminClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
 
 // ========== KATEGORI ==========
-export async function getKategori(tipe?: "pendapatan" | "pengeluaran") {
+export async function getKategori(tipe?: "pendapatan" | "pengeluaran" | "produk") {
     const supabase = await createClient();
     let query = supabase.from("kategori").select("*").order("nama");
     if (tipe) query = query.eq("tipe", tipe);
@@ -31,6 +31,8 @@ export async function upsertKategori(formData: FormData) {
     }
     revalidatePath("/pendapatan");
     revalidatePath("/pengeluaran");
+    revalidatePath("/dashboard/produk");
+    revalidatePath("/dashboard/produk/kategori");
     return { success: true };
 }
 
@@ -286,13 +288,19 @@ export async function bayarGaji(id: string) {
 }
 
 // ========== PRODUK ==========
-export async function getProduk() {
+export async function getProduk(categoryId?: string) {
     const supabase = await createClient();
-    const { data, error } = await supabase
+    let query = supabase
         .from("produk")
-        .select("*")
+        .select("*, kategori(*)")
         .eq("is_active", true)
         .order("nama");
+
+    if (categoryId && categoryId !== "all") {
+        query = query.eq("kategori_id", categoryId);
+    }
+
+    const { data, error } = await query;
     if (error) throw error;
     return data;
 }
@@ -306,6 +314,7 @@ export async function upsertProduk(formData: FormData) {
         harga: parseFloat(formData.get("harga") as string),
         stok: parseInt(formData.get("stok") as string) || 0,
         satuan: (formData.get("satuan") as string) || "pcs",
+        kategori_id: (formData.get("kategori_id") as string) || null,
         is_active: true,
     };
 
@@ -316,6 +325,8 @@ export async function upsertProduk(formData: FormData) {
         const { error } = await supabase.from("produk").insert(payload);
         if (error) return { error: error.message };
     }
+    revalidatePath("/dashboard/produk");
+    revalidatePath("/dashboard/pos");
     revalidatePath("/pos");
     return { success: true };
 }

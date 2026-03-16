@@ -1,4 +1,4 @@
-import { getProduk } from "@/actions/data";
+import { getProduk, getKategori } from "@/actions/data";
 import { ProdukClient } from "./client";
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
@@ -11,6 +11,10 @@ export default async function ProdukPage() {
         redirect("/dashboard/pos");
     }
 
-    const data = await getProduk();
-    return <ProdukClient data={data || []} />;
+    const [data, kategoriList] = await Promise.all([
+        getProduk(),
+        getKategori("produk"),
+    ]);
+
+    return <ProdukClient data={data || []} kategoriList={kategoriList || []} />;
 }

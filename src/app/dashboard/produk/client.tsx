@@ -16,8 +16,12 @@ import { Badge } from "@/components/ui/badge";
 import { Plus, Download, Trash2, Pencil, Package } from "lucide-react";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { ListFilter } from "lucide-react";
+import Link from "next/link";
+import type { Kategori } from "@/lib/types";
 
-export function ProdukClient({ data }: { data: Produk[] }) {
+export function ProdukClient({ data, kategoriList }: { data: Produk[]; kategoriList: Kategori[] }) {
     const router = useRouter();
     const [open, setOpen] = useState(false);
     const [editing, setEditing] = useState<Produk | null>(null);
@@ -69,6 +73,11 @@ export function ProdukClient({ data }: { data: Produk[] }) {
                     <Button variant="outline" size="sm" onClick={handleExport}>
                         <Download className="mr-2 h-4 w-4" /> Export
                     </Button>
+                    <Link href="/dashboard/produk/kategori">
+                        <Button variant="outline" size="sm">
+                            <ListFilter className="mr-2 h-4 w-4" /> Kelola Kategori
+                        </Button>
+                    </Link>
                     <Dialog open={open} onOpenChange={(v) => { setOpen(v); if (!v) setEditing(null); }}>
                         <DialogTrigger asChild>
                             <Button size="sm"><Plus className="mr-2 h-4 w-4" /> Tambah Produk</Button>
@@ -92,9 +101,23 @@ export function ProdukClient({ data }: { data: Produk[] }) {
                                         <Input name="satuan" defaultValue={editing?.satuan || "pcs"} placeholder="pcs, porsi, jam" />
                                     </div>
                                 </div>
-                                <div className="space-y-2">
-                                    <Label>Stok Awal</Label>
-                                    <Input type="number" name="stok" defaultValue={editing?.stok || 0} placeholder="Bisa diset 0 jika berupa Jasa" />
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div className="space-y-2">
+                                        <Label>Stok Awal</Label>
+                                        <Input type="number" name="stok" defaultValue={editing?.stok || 0} placeholder="Bisa diset 0 jika berupa Jasa" />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label>Kategori</Label>
+                                        <Select name="kategori_id" defaultValue={editing?.kategori_id || ""}>
+                                            <SelectTrigger><SelectValue placeholder="Pilih Kategori" /></SelectTrigger>
+                                            <SelectContent>
+                                                <SelectItem value=" ">Tanpa Kategori</SelectItem>
+                                                {kategoriList.map((k) => (
+                                                    <SelectItem key={k.id} value={k.id}>{k.nama}</SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
+                                    </div>
                                 </div>
                                 <div className="space-y-2">
                                     <Label>Deskripsi</Label>
@@ -113,6 +136,7 @@ export function ProdukClient({ data }: { data: Produk[] }) {
                         <TableHeader>
                             <TableRow>
                                 <TableHead>Nama Barang/Jasa</TableHead>
+                                <TableHead>Kategori</TableHead>
                                 <TableHead className="text-right">Harga</TableHead>
                                 <TableHead className="text-center">Stok</TableHead>
                                 <TableHead>Status</TableHead>
@@ -140,6 +164,13 @@ export function ProdukClient({ data }: { data: Produk[] }) {
                                         <TableCell>
                                             <p className="font-medium">{d.nama}</p>
                                             {d.deskripsi && <p className="text-xs text-muted-foreground line-clamp-1">{d.deskripsi}</p>}
+                                        </TableCell>
+                                        <TableCell>
+                                            {d.kategori ? (
+                                                <Badge variant="outline" className="text-[10px] font-normal">{d.kategori.nama}</Badge>
+                                            ) : (
+                                                <span className="text-xs text-muted-foreground">-</span>
+                                            )}
                                         </TableCell>
                                         <TableCell className="text-right font-semibold text-emerald-600">
                                             {formatRupiah(d.harga)}<span className="text-xs text-muted-foreground font-normal">/{d.satuan}</span>

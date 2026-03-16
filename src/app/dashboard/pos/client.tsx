@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { createTransaksi } from "@/actions/data";
 import { formatRupiah, METODE_PEMBAYARAN } from "@/lib/format";
-import type { Produk, CartItem } from "@/lib/types";
+import type { Produk, CartItem, Kategori } from "@/lib/types";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -14,7 +14,7 @@ import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
 
-export function PosClient({ produkList }: { produkList: Produk[] }) {
+export function PosClient({ produkList, kategoriList }: { produkList: Produk[]; kategoriList: Kategori[] }) {
     const router = useRouter();
     const [search, setSearch] = useState("");
     const [cart, setCart] = useState<CartItem[]>([]);
@@ -25,11 +25,14 @@ export function PosClient({ produkList }: { produkList: Produk[] }) {
     const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [successTrx, setSuccessTrx] = useState("");
+    const [selectedCategory, setSelectedCategory] = useState<string>("all");
 
-    const filteredProduk = produkList.filter((p) =>
-        p.nama.toLowerCase().includes(search.toLowerCase()) ||
-        (p.deskripsi && p.deskripsi.toLowerCase().includes(search.toLowerCase()))
-    );
+    const filteredProduk = produkList.filter((p) => {
+        const matchesSearch = p.nama.toLowerCase().includes(search.toLowerCase()) ||
+            (p.deskripsi && p.deskripsi.toLowerCase().includes(search.toLowerCase()));
+        const matchesCategory = selectedCategory === "all" || p.kategori_id === selectedCategory;
+        return matchesSearch && matchesCategory;
+    });
 
     const subtotal = cart.reduce((sum, item) => sum + item.subtotal, 0);
     const diskonNominal = diskonType === "nominal" ? diskonValue : (subtotal * diskonValue / 100);
@@ -165,15 +168,50 @@ export function PosClient({ produkList }: { produkList: Produk[] }) {
                                             <Input name="satuan" defaultValue="pcs" placeholder="pcs, porsi, jam" />
                                         </div>
                                     </div>
-                                    <div className="space-y-2">
-                                        <Label>Stok Awal</Label>
-                                        <Input type="number" name="stok" defaultValue={0} placeholder="Bisa diset 0 jika berupa Jasa" />
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <div className="space-y-2">
+                                            <Label>Stok Awal</Label>
+                                            <Input type="number" name="stok" defaultValue={0} placeholder="Bisa diset 0 jika berupa Jasa" />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <Label>Kategori</Label>
+                                            <Select name="kategori_id">
+                                                <SelectTrigger><SelectValue placeholder="Pilih Kategori" /></SelectTrigger>
+                                                <SelectContent>
+                                                    {kategoriList.map((k) => (
+                                                        <SelectItem key={k.id} value={k.id}>{k.nama}</SelectItem>
+                                                    ))}
+                                                </SelectContent>
+                                            </Select>
+                                        </div>
                                     </div>
                                     <Button type="submit" className="w-full">Simpan ke Katalog</Button>
                                 </form>
                             </DialogContent>
                         </Dialog>
                     </div>
+                </div>
+
+                <div className="px-4 py-2 border-b flex gap-2 overflow-x-auto no-scrollbar bg-zinc-50/50 dark:bg-zinc-900/50">
+                    <Button
+                        variant={selectedCategory === "all" ? "default" : "outline"}
+                        size="sm"
+                        className="rounded-full flex-shrink-0"
+                        onClick={() => setSelectedCategory("all")}
+                    >
+                        Semua
+                    </Button>
+                    {kategoriList.map(cat => (
+                        <Button
+                            key={cat.id}
+                            variant={selectedCategory === cat.id ? "default" : "outline"}
+                            size="sm"
+                            className="rounded-full flex-shrink-0"
+                            onClick={() => setSelectedCategory(cat.id)}
+                        >
+                            {cat.nama}
+                        </Button>
+                    ))}
                 </div>
 
                 <div className="flex-1 overflow-y-auto p-4">
@@ -231,7 +269,14 @@ export function PosClient({ produkList }: { produkList: Produk[] }) {
                                 >
                                     <div className="p-4 flex-1 w-full">
                                         <h3 className="font-medium text-sm line-clamp-2 pr-4">{p.nama}</h3>
-                                        {p.deskripsi && <p className="text-xs text-muted-foreground mt-1 line-clamp-1">{p.deskripsi}</p>}
+                                        <div className="flex items-center gap-1.5 mt-1">
+                                            {p.kategori && (
+                                                <span className="text-[10px] bg-zinc-100 dark:bg-zinc-800 px-1.5 py-0.5 rounded text-muted-foreground">
+                                                    {p.kategori.nama}
+                                                </span>
+                                            )}
+                                            {p.deskripsi && <p className="text-xs text-muted-foreground line-clamp-1">{p.deskripsi}</p>}
+                                        </div>
 
                                         <div className="absolute top-3 right-3">
                                             {p.stok > 0 ? (

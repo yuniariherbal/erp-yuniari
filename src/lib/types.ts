@@ -1,7 +1,7 @@
 export type Kategori = {
     id: string;
     nama: string;
-    tipe: "pendapatan" | "pengeluaran";
+    tipe: "pendapatan" | "pengeluaran" | "produk";
     deskripsi: string | null;
     created_at: string;
 };
@@ -69,8 +69,10 @@ export type Produk = {
     harga: number;
     stok: number;
     satuan: string;
+    kategori_id: string | null;
     is_active: boolean;
     created_at: string;
+    kategori?: Kategori;
 };
 
 export type Transaksi = {
