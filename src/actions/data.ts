@@ -435,7 +435,7 @@ export async function createTransaksi(
 }
 
 // ========== DASHBOARD STATS ==========
-export async function getDashboardStats() {
+export async function getDashboardStats(userId?: string) {
     const supabase = await createClient();
     const now = new Date();
     const bulanIni = now.getMonth() + 1;
@@ -445,38 +445,60 @@ export async function getDashboardStats() {
     const endYear = bulanIni === 12 ? tahunIni + 1 : tahunIni;
     const endDate = `${endYear}-${String(endMonth).padStart(2, "0")}-01`;
 
-    const [pendapatan, pengeluaran, transaksi, penggajianPending] = await Promise.all([
-        supabase
-            .from("pendapatan")
-            .select("jumlah")
-            .gte("tanggal", startDate)
-            .lt("tanggal", endDate),
-        supabase
-            .from("pengeluaran")
-            .select("jumlah")
-            .gte("tanggal", startDate)
-            .lt("tanggal", endDate),
-        supabase
-            .from("transaksi")
-            .select("total_bayar, tanggal")
-            .order("tanggal", { ascending: false })
-            .limit(5),
-        supabase
-            .from("penggajian")
-            .select("id")
-            .eq("status", "pending"),
+    let pQuery = supabase.from("pendapatan").select("jumlah, tanggal, deskripsi, metode_pembayaran").gte("tanggal", startDate).lt("tanggal", endDate);
+    let kQuery = supabase.from("pengeluaran").select("jumlah, tanggal, deskripsi, metode_pembayaran").gte("tanggal", startDate).lt("tanggal", endDate);
+    let gQuery = supabase.from("penggajian").select("id").eq("status", "pending");
+
+    if (userId) {
+        pQuery = pQuery.eq("user_id", userId);
+        kQuery = kQuery.eq("user_id", userId);
+        // Karyawan doesn't need to see global pending payroll
+    }
+
+    const [pendapatanData, pengeluaranData, penggajianPending] = await Promise.all([
+        pQuery,
+        kQuery,
+        userId ? { data: [] } : gQuery, // Hide payroll stats for non-admins
     ]);
 
-    const totalPendapatan = (pendapatan.data || []).reduce((sum, r) => sum + r.jumlah, 0);
-    const totalPengeluaran = (pengeluaran.data || []).reduce((sum, r) => sum + r.jumlah, 0);
+    const totalPendapatan = (pendapatanData.data || []).reduce((sum, r) => sum + r.jumlah, 0);
+    const totalPengeluaran = (pengeluaranData.data || []).reduce((sum, r) => sum + r.jumlah, 0);
+
+    // Get recent transactions from both tables
+    let recentPQuery = supabase.from("pendapatan").select("jumlah, tanggal, deskripsi, metode_pembayaran").order("tanggal", { ascending: false }).limit(5);
+    let recentKQuery = supabase.from("pengeluaran").select("jumlah, tanggal, deskripsi, metode_pembayaran").order("tanggal", { ascending: false }).limit(5);
+
+    if (userId) {
+        recentPQuery = recentPQuery.eq("user_id", userId);
+        recentKQuery = recentKQuery.eq("user_id", userId);
+    }
+
+    const [recentP, recentK] = await Promise.all([
+        recentPQuery,
+        recentKQuery,
+    ]);
+
+    const recentTransaksi = [
+        ...(recentP.data || []).map(item => ({ ...item, tipe: "pendapatan" as const })),
+        ...(recentK.data || []).map(item => ({ ...item, tipe: "pengeluaran" as const })),
+    ].sort((a, b) => new Date(b.tanggal).getTime() - new Date(a.tanggal).getTime())
+     .slice(0, 5);
 
     // Get monthly data for chart (last 6 months)
     const sixMonthsAgoD = new Date(tahunIni, bulanIni - 6, 1);
     const sixMonthsAgoS = `${sixMonthsAgoD.getFullYear()}-${String(sixMonthsAgoD.getMonth() + 1).padStart(2, "0")}-01`;
 
+    let allPQuery = supabase.from("pendapatan").select("jumlah, tanggal").gte("tanggal", sixMonthsAgoS).lt("tanggal", endDate);
+    let allKQuery = supabase.from("pengeluaran").select("jumlah, tanggal").gte("tanggal", sixMonthsAgoS).lt("tanggal", endDate);
+
+    if (userId) {
+        allPQuery = allPQuery.eq("user_id", userId);
+        allKQuery = allKQuery.eq("user_id", userId);
+    }
+
     const [allP, allK] = await Promise.all([
-        supabase.from("pendapatan").select("jumlah, tanggal").gte("tanggal", sixMonthsAgoS).lt("tanggal", endDate),
-        supabase.from("pengeluaran").select("jumlah, tanggal").gte("tanggal", sixMonthsAgoS).lt("tanggal", endDate),
+        allPQuery,
+        allKQuery,
     ]);
 
     const chartData = [];
@@ -497,12 +519,13 @@ export async function getDashboardStats() {
             pengeluaran: kFiltered.reduce((sum, r) => sum + r.jumlah, 0),
         });
     }
+
     return {
         totalPendapatan,
         totalPengeluaran,
         profit: totalPendapatan - totalPengeluaran,
-        recentTransaksi: transaksi.data || [],
-        penggajianPending: penggajianPending.data?.length || 0,
+        recentTransaksi,
+        penggajianPending: (penggajianPending as any).data?.length || 0,
         chartData,
     };
 }

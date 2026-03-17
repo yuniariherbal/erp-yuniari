@@ -176,76 +176,88 @@ export function PenggajianClient({ data, karyawanList }: { data: Penggajian[]; k
                 </div>
             </div>
 
-            <Card className="border-0 shadow-sm">
+            <Card className="border-0 shadow-sm overflow-hidden">
                 <CardContent className="p-0">
-                    <Table>
-                        <TableHeader>
-                            <TableRow>
-                                <TableHead>Periode</TableHead>
-                                <TableHead>Karyawan</TableHead>
-                                <TableHead className="text-right">Gaji Pokok</TableHead>
-                                <TableHead className="text-right">+ Tunjangan/Bonus</TableHead>
-                                <TableHead className="text-right text-red-500">- Potongan</TableHead>
-                                <TableHead className="text-right font-bold">Total Bersih</TableHead>
-                                <TableHead>Status</TableHead>
-                                <TableHead className="w-[100px]"></TableHead>
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            {data.length === 0 ? (
+                    <div className="overflow-x-auto">
+                        <Table>
+                            <TableHeader>
                                 <TableRow>
-                                    <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
-                                        Belum ada data penggajian
-                                    </TableCell>
+                                    <TableHead className="min-w-[100px]">Periode</TableHead>
+                                    <TableHead>Karyawan</TableHead>
+                                    <TableHead className="text-right hidden sm:table-cell">Gaji Pokok</TableHead>
+                                    <TableHead className="text-right hidden md:table-cell">+ T/B</TableHead>
+                                    <TableHead className="text-right hidden md:table-cell text-red-500">- Pot</TableHead>
+                                    <TableHead className="text-right font-bold">Total Bersih</TableHead>
+                                    <TableHead>Status</TableHead>
+                                    <TableHead className="w-[100px]"></TableHead>
                                 </TableRow>
-                            ) : (
-                                data.map((d) => (
-                                    <TableRow key={d.id}>
-                                        <TableCell className="font-medium text-sm">
-                                            {MONTHS[d.periode_bulan - 1]} {d.periode_tahun}
-                                        </TableCell>
-                                        <TableCell>{d.karyawan?.nama}</TableCell>
-                                        <TableCell className="text-right text-sm">{formatRupiah(d.gaji_pokok)}</TableCell>
-                                        <TableCell className="text-right text-sm text-emerald-600">
-                                            +{formatRupiah(d.tunjangan + d.bonus)}
-                                        </TableCell>
-                                        <TableCell className="text-right text-sm text-red-500">
-                                            -{formatRupiah(d.potongan)}
-                                        </TableCell>
-                                        <TableCell className="text-right font-bold text-sm">
-                                            {formatRupiah(d.total_gaji)}
-                                        </TableCell>
-                                        <TableCell>
-                                            {d.status === "dibayar" ? (
-                                                <Badge variant="outline" className="bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950 dark:text-emerald-400 dark:border-emerald-800">
-                                                    Dibayar
-                                                </Badge>
-                                            ) : (
-                                                <Badge variant="secondary" className="bg-amber-50 text-amber-700 dark:bg-amber-950 dark:text-amber-400">
-                                                    Pending
-                                                </Badge>
-                                            )}
-                                        </TableCell>
-                                        <TableCell>
-                                            <div className="flex gap-1 justify-end">
-                                                {d.status === "pending" && (
-                                                    <Button variant="ghost" size="icon" className="h-7 w-7 text-emerald-600" onClick={() => handleBayar(d.id)} title="Bayar">
-                                                        <CheckCircle2 className="h-4 w-4" />
-                                                    </Button>
-                                                )}
-                                                <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => { setEditing(d); setOpen(true); }}>
-                                                    <Pencil className="h-3.5 w-3.5" />
-                                                </Button>
-                                                <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive" onClick={() => handleDelete(d.id)}>
-                                                    <Trash2 className="h-3.5 w-3.5" />
-                                                </Button>
-                                            </div>
+                            </TableHeader>
+                            <TableBody>
+                                {data.length === 0 ? (
+                                    <TableRow>
+                                        <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
+                                            Belum ada data penggajian
                                         </TableCell>
                                     </TableRow>
-                                ))
-                            )}
-                        </TableBody>
-                    </Table>
+                                ) : (
+                                    data.map((d) => (
+                                        <TableRow key={d.id} className="text-sm">
+                                            <TableCell className="font-medium">
+                                                <div className="flex flex-col">
+                                                    <span>{MONTHS[d.periode_bulan - 1]}</span>
+                                                    <span className="text-[10px] text-muted-foreground">{d.periode_tahun}</span>
+                                                </div>
+                                            </TableCell>
+                                            <TableCell>
+                                                <div className="flex flex-col">
+                                                    <span className="font-semibold">{d.karyawan?.nama}</span>
+                                                    <span className="text-[10px] text-muted-foreground sm:hidden">
+                                                        Pokok: {formatRupiah(d.gaji_pokok)}
+                                                    </span>
+                                                </div>
+                                            </TableCell>
+                                            <TableCell className="text-right hidden sm:table-cell">{formatRupiah(d.gaji_pokok)}</TableCell>
+                                            <TableCell className="text-right hidden md:table-cell text-emerald-600">
+                                                +{formatRupiah(d.tunjangan + d.bonus)}
+                                            </TableCell>
+                                            <TableCell className="text-right hidden md:table-cell text-red-500">
+                                                -{formatRupiah(d.potongan)}
+                                            </TableCell>
+                                            <TableCell className="text-right font-bold text-zinc-900 dark:text-zinc-100">
+                                                {formatRupiah(d.total_gaji)}
+                                            </TableCell>
+                                            <TableCell>
+                                                {d.status === "dibayar" ? (
+                                                    <Badge variant="outline" className="bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950 dark:text-emerald-400 dark:border-emerald-800 text-[10px] py-0 h-4">
+                                                        Lunas
+                                                    </Badge>
+                                                ) : (
+                                                    <Badge variant="secondary" className="bg-amber-50 text-amber-700 dark:bg-amber-950 dark:text-amber-400 text-[10px] py-0 h-4">
+                                                        Pending
+                                                    </Badge>
+                                                )}
+                                            </TableCell>
+                                            <TableCell>
+                                                <div className="flex gap-1 justify-end">
+                                                    {d.status === "pending" && (
+                                                        <Button variant="ghost" size="icon" className="h-7 w-7 text-emerald-600" onClick={() => handleBayar(d.id)} title="Bayar">
+                                                            <CheckCircle2 className="h-4 w-4" />
+                                                        </Button>
+                                                    )}
+                                                    <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => { setEditing(d); setOpen(true); }}>
+                                                        <Pencil className="h-3.5 w-3.5" />
+                                                    </Button>
+                                                    <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive" onClick={() => handleDelete(d.id)}>
+                                                        <Trash2 className="h-3.5 w-3.5" />
+                                                    </Button>
+                                                </div>
+                                            </TableCell>
+                                        </TableRow>
+                                    ))
+                                )}
+                            </TableBody>
+                        </Table>
+                    </div>
                 </CardContent>
             </Card>
         </div>

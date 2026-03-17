@@ -108,72 +108,81 @@ export function MitraClient({ data }: { data: Mitra[] }) {
                 </div>
             </div>
 
-            <Card className="border-0 shadow-sm">
+            <Card className="border-0 shadow-sm overflow-hidden">
                 <CardContent className="p-0">
-                    <Table>
-                        <TableHeader>
-                            <TableRow>
-                                <TableHead className="w-[100px]">ID Mitra</TableHead>
-                                <TableHead>Nama Mitra</TableHead>
-                                <TableHead>Kategori</TableHead>
-                                <TableHead>Kontak WA</TableHead>
-                                <TableHead>Alamat</TableHead>
-                                <TableHead className="w-[100px]"></TableHead>
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            {data.length === 0 ? (
+                    <div className="overflow-x-auto">
+                        <Table>
+                            <TableHeader>
                                 <TableRow>
-                                    <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
-                                        Belum ada data mitra
-                                    </TableCell>
+                                    <TableHead className="min-w-[120px]">Nama Mitra</TableHead>
+                                    <TableHead className="hidden sm:table-cell">Kategori</TableHead>
+                                    <TableHead>Kontak/Alamat</TableHead>
+                                    <TableHead className="w-[80px]"></TableHead>
                                 </TableRow>
-                            ) : (
-                                data.map((d) => (
-                                    <TableRow key={d.id}>
-                                        <TableCell>
-                                            <Link
-                                                href={`/dashboard/tagihan?mitraId=${d.id}`}
-                                                className="text-[10px] font-mono bg-zinc-100 dark:bg-zinc-800 px-1.5 py-0.5 rounded hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors"
-                                            >
-                                                {d.id.slice(0, 8)}...
-                                            </Link>
-                                        </TableCell>
-                                        <TableCell className="font-medium">
-                                            <Link href={`/dashboard/tagihan?mitraId=${d.id}`} className="hover:underline">
-                                                {d.nama}
-                                            </Link>
-                                        </TableCell>
-                                        <TableCell>
-                                            <Badge variant={
-                                                d.kategori === "Maklon" ? "destructive" :
-                                                    d.kategori === "Agen" ? "default" : "secondary"
-                                            }>
-                                                {d.kategori}
-                                            </Badge>
-                                        </TableCell>
-                                        <TableCell className="text-sm text-muted-foreground">{d.kontak_wa || "-"}</TableCell>
-                                        <TableCell className="text-sm text-muted-foreground">{d.alamat || "-"}</TableCell>
-                                        <TableCell>
-                                            <div className="flex gap-1">
-                                                <Button variant="ghost" size="icon" className="h-7 w-7" asChild title="Lihat Tagihan">
-                                                    <Link href={`/dashboard/tagihan?mitraId=${d.id}`}>
-                                                        <FileText className="h-3.5 w-3.5" />
-                                                    </Link>
-                                                </Button>
-                                                <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => { setEditing(d); setOpen(true); }}>
-                                                    <Pencil className="h-3.5 w-3.5" />
-                                                </Button>
-                                                <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive" onClick={() => handleDelete(d.id)}>
-                                                    <Trash2 className="h-3.5 w-3.5" />
-                                                </Button>
-                                            </div>
+                            </TableHeader>
+                            <TableBody>
+                                {data.length === 0 ? (
+                                    <TableRow>
+                                        <TableCell colSpan={4} className="text-center py-8 text-muted-foreground">
+                                            Belum ada data mitra
                                         </TableCell>
                                     </TableRow>
-                                ))
-                            )}
-                        </TableBody>
-                    </Table>
+                                ) : (
+                                    data.map((d) => (
+                                        <TableRow key={d.id}>
+                                            <TableCell>
+                                                <div className="flex flex-col gap-1">
+                                                    <Link href={`/dashboard/tagihan?mitraId=${d.id}`} className="font-bold hover:underline decoration-zinc-400 underline-offset-4">
+                                                        {d.nama}
+                                                    </Link>
+                                                    <div className="flex items-center gap-2 sm:hidden">
+                                                        <Badge variant={
+                                                            d.kategori === "Maklon" ? "destructive" :
+                                                                d.kategori === "Agen" ? "default" : "secondary"
+                                                        } className="text-[10px] py-0 h-4">
+                                                            {d.kategori}
+                                                        </Badge>
+                                                        <span className="text-[10px] font-mono text-muted-foreground bg-zinc-100 dark:bg-zinc-800 px-1 rounded">
+                                                            ID: {d.id.slice(0, 5)}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </TableCell>
+                                            <TableCell className="hidden sm:table-cell">
+                                                <Badge variant={
+                                                    d.kategori === "Maklon" ? "destructive" :
+                                                        d.kategori === "Agen" ? "default" : "secondary"
+                                                }>
+                                                    {d.kategori}
+                                                </Badge>
+                                            </TableCell>
+                                            <TableCell>
+                                                <div className="flex flex-col gap-0.5">
+                                                    <p className="text-sm font-medium">{d.kontak_wa || "-"}</p>
+                                                    <p className="text-xs text-muted-foreground line-clamp-1">{d.alamat || "-"}</p>
+                                                </div>
+                                            </TableCell>
+                                            <TableCell>
+                                                <div className="flex gap-1 justify-end">
+                                                    <Button variant="ghost" size="icon" className="h-7 w-7" asChild title="Lihat Tagihan">
+                                                        <Link href={`/dashboard/tagihan?mitraId=${d.id}`}>
+                                                            <FileText className="h-3.5 w-3.5" />
+                                                        </Link>
+                                                    </Button>
+                                                    <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => { setEditing(d); setOpen(true); }}>
+                                                        <Pencil className="h-3.5 w-3.5" />
+                                                    </Button>
+                                                    <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive" onClick={() => handleDelete(d.id)}>
+                                                        <Trash2 className="h-3.5 w-3.5" />
+                                                    </Button>
+                                                </div>
+                                            </TableCell>
+                                        </TableRow>
+                                    ))
+                                )}
+                            </TableBody>
+                        </Table>
+                    </div>
                 </CardContent>
             </Card>
         </div>

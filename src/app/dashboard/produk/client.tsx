@@ -130,78 +130,86 @@ export function ProdukClient({ data, kategoriList }: { data: Produk[]; kategoriL
                 </div>
             </div>
 
-            <Card className="border-0 shadow-sm">
+            <Card className="border-0 shadow-sm overflow-hidden">
                 <CardContent className="p-0">
-                    <Table>
-                        <TableHeader>
-                            <TableRow>
-                                <TableHead>Nama Barang/Jasa</TableHead>
-                                <TableHead>Kategori</TableHead>
-                                <TableHead className="text-right">Harga</TableHead>
-                                <TableHead className="text-center">Stok</TableHead>
-                                <TableHead>Status</TableHead>
-                                <TableHead className="w-[80px]"></TableHead>
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            {data.length === 0 ? (
+                    <div className="overflow-x-auto">
+                        <Table>
+                            <TableHeader>
                                 <TableRow>
-                                    <TableCell colSpan={5} className="text-center py-10 text-muted-foreground">
-                                        <div className="flex flex-col items-center justify-center space-y-3">
-                                            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-muted">
-                                                <Package className="h-6 w-6 text-muted-foreground" />
-                                            </div>
-                                            <p>Katalog masih kosong</p>
-                                            <Button variant="outline" size="sm" onClick={() => setOpen(true)}>
-                                                <Plus className="mr-2 h-4 w-4" /> Tambah Produk Pertama
-                                            </Button>
-                                        </div>
-                                    </TableCell>
+                                    <TableHead className="min-w-[150px]">Nama Barang/Jasa</TableHead>
+                                    <TableHead className="hidden md:table-cell">Kategori</TableHead>
+                                    <TableHead className="text-right">Harga</TableHead>
+                                    <TableHead className="text-center">Stok</TableHead>
+                                    <TableHead className="hidden sm:table-cell">Status</TableHead>
+                                    <TableHead className="w-[80px]"></TableHead>
                                 </TableRow>
-                            ) : (
-                                data.map((d) => (
-                                    <TableRow key={d.id}>
-                                        <TableCell>
-                                            <p className="font-medium">{d.nama}</p>
-                                            {d.deskripsi && <p className="text-xs text-muted-foreground line-clamp-1">{d.deskripsi}</p>}
-                                        </TableCell>
-                                        <TableCell>
-                                            {d.kategori ? (
-                                                <Badge variant="outline" className="text-[10px] font-normal">{d.kategori.nama}</Badge>
-                                            ) : (
-                                                <span className="text-xs text-muted-foreground">-</span>
-                                            )}
-                                        </TableCell>
-                                        <TableCell className="text-right font-semibold text-emerald-600">
-                                            {formatRupiah(d.harga)}<span className="text-xs text-muted-foreground font-normal">/{d.satuan}</span>
-                                        </TableCell>
-                                        <TableCell className="text-center">
-                                            <span className={`font-medium ${d.stok <= 5 && d.stok > 0 ? "text-amber-500" : d.stok <= 0 ? "text-red-500" : ""}`}>
-                                                {d.stok}
-                                            </span>
-                                        </TableCell>
-                                        <TableCell>
-                                            {d.stok > 0 ? (
-                                                <Badge variant="outline" className="bg-emerald-50 text-emerald-700">Tersedia</Badge>
-                                            ) : (
-                                                <Badge variant="secondary" className="bg-red-50 text-red-700">Habis</Badge>
-                                            )}
-                                        </TableCell>
-                                        <TableCell>
-                                            <div className="flex gap-1 justify-end">
-                                                <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => { setEditing(d); setOpen(true); }}>
-                                                    <Pencil className="h-3.5 w-3.5" />
-                                                </Button>
-                                                <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive" onClick={() => handleDelete(d.id)}>
-                                                    <Trash2 className="h-3.5 w-3.5" />
+                            </TableHeader>
+                            <TableBody>
+                                {data.length === 0 ? (
+                                    <TableRow>
+                                        <TableCell colSpan={6} className="text-center py-10 text-muted-foreground">
+                                            <div className="flex flex-col items-center justify-center space-y-3">
+                                                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-muted">
+                                                    <Package className="h-6 w-6 text-muted-foreground" />
+                                                </div>
+                                                <p>Katalog masih kosong</p>
+                                                <Button variant="outline" size="sm" onClick={() => setOpen(true)}>
+                                                    <Plus className="mr-2 h-4 w-4" /> Tambah Produk Pertama
                                                 </Button>
                                             </div>
                                         </TableCell>
                                     </TableRow>
-                                ))
-                            )}
-                        </TableBody>
-                    </Table>
+                                ) : (
+                                    data.map((d) => (
+                                        <TableRow key={d.id}>
+                                            <TableCell>
+                                                <p className="font-medium">{d.nama}</p>
+                                                <div className="flex flex-col sm:hidden gap-1 mt-1">
+                                                    {d.kategori && (
+                                                        <span className="text-[10px] text-muted-foreground uppercase">{d.kategori.nama}</span>
+                                                    )}
+                                                </div>
+                                                {d.deskripsi && <p className="text-xs text-muted-foreground line-clamp-1">{d.deskripsi}</p>}
+                                            </TableCell>
+                                            <TableCell className="hidden md:table-cell">
+                                                {d.kategori ? (
+                                                    <Badge variant="outline" className="text-[10px] font-normal">{d.kategori.nama}</Badge>
+                                                ) : (
+                                                    <span className="text-xs text-muted-foreground">-</span>
+                                                )}
+                                            </TableCell>
+                                            <TableCell className="text-right font-semibold text-emerald-600">
+                                                {formatRupiah(d.harga)}<span className="text-xs text-muted-foreground font-normal sm:hidden"></span>
+                                            </TableCell>
+                                            <TableCell className="text-center">
+                                                <span className={`font-bold ${d.stok <= 5 && d.stok > 0 ? "text-amber-500" : d.stok <= 0 ? "text-red-500" : ""}`}>
+                                                    {d.stok}
+                                                </span>
+                                                <span className="text-[10px] text-muted-foreground block sm:inline sm:ml-1 lowercase">{d.satuan}</span>
+                                            </TableCell>
+                                            <TableCell className="hidden sm:table-cell">
+                                                {d.stok > 0 ? (
+                                                    <Badge variant="outline" className="bg-emerald-50 text-emerald-700">Tersedia</Badge>
+                                                ) : (
+                                                    <Badge variant="secondary" className="bg-red-50 text-red-700">Habis</Badge>
+                                                )}
+                                            </TableCell>
+                                            <TableCell>
+                                                <div className="flex gap-1 justify-end">
+                                                    <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => { setEditing(d); setOpen(true); }}>
+                                                        <Pencil className="h-3.5 w-3.5" />
+                                                    </Button>
+                                                    <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive" onClick={() => handleDelete(d.id)}>
+                                                        <Trash2 className="h-3.5 w-3.5" />
+                                                    </Button>
+                                                </div>
+                                            </TableCell>
+                                        </TableRow>
+                                    ))
+                                )}
+                            </TableBody>
+                        </Table>
+                    </div>
                 </CardContent>
             </Card>
         </div>

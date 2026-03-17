@@ -87,18 +87,18 @@ export function LaporanClient({
                     <h1 className="text-2xl font-bold tracking-tight">Laporan Keuangan</h1>
                     <p className="text-muted-foreground">Monitor kesehatan bisnis bulanan</p>
                 </div>
-                <div className="flex gap-2 p-1.5 bg-zinc-100 dark:bg-zinc-800 rounded-xl border items-center shadow-sm">
+                <div className="flex gap-1 sm:gap-2 p-1 sm:p-1.5 bg-zinc-100 dark:bg-zinc-800 rounded-xl border items-center shadow-sm w-full sm:w-auto">
                     <Select value={String(bulan)} onValueChange={(v) => setBulan(Number(v))}>
-                        <SelectTrigger className="w-[130px] h-9 border-0 bg-transparent shadow-none focus:ring-0">
+                        <SelectTrigger className="flex-1 sm:w-[130px] h-9 border-0 bg-transparent shadow-none focus:ring-0 text-sm">
                             <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
                             {MONTHS.map((m, i) => <SelectItem key={m} value={String(i + 1)}>{m}</SelectItem>)}
                         </SelectContent>
                     </Select>
-                    <div className="w-px h-6 bg-zinc-300 dark:bg-zinc-700 mx-1"></div>
+                    <div className="w-px h-6 bg-zinc-300 dark:bg-zinc-700 mx-0.5 sm:mx-1"></div>
                     <Select value={String(tahun)} onValueChange={(v) => setTahun(Number(v))}>
-                        <SelectTrigger className="w-[100px] h-9 border-0 bg-transparent shadow-none focus:ring-0">
+                        <SelectTrigger className="flex-1 sm:w-[100px] h-9 border-0 bg-transparent shadow-none focus:ring-0 text-sm">
                             <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
@@ -132,11 +132,13 @@ export function LaporanClient({
             </div>
 
             <Tabs defaultValue="laba-rugi" className="w-full">
-                <TabsList className="grid w-full grid-cols-3 P-1 mb-4">
-                    <TabsTrigger value="laba-rugi">Laba Rugi</TabsTrigger>
-                    <TabsTrigger value="pendapatan">Rekap Pendapatan</TabsTrigger>
-                    <TabsTrigger value="pengeluaran">Rekap Pengeluaran</TabsTrigger>
-                </TabsList>
+                <div className="overflow-x-auto pb-2 -mx-4 px-4 sm:mx-0 sm:px-0">
+                    <TabsList className="flex w-max sm:w-full sm:grid sm:grid-cols-3 p-1 mb-2">
+                        <TabsTrigger value="laba-rugi" className="px-6 whitespace-nowrap">Laba Rugi</TabsTrigger>
+                        <TabsTrigger value="pendapatan" className="px-6 whitespace-nowrap">Rekap Pemasukan</TabsTrigger>
+                        <TabsTrigger value="pengeluaran" className="px-6 whitespace-nowrap">Rekap Pengeluaran</TabsTrigger>
+                    </TabsList>
+                </div>
 
                 {/* Laporan Laba Rugi */}
                 <TabsContent value="laba-rugi">
@@ -153,11 +155,11 @@ export function LaporanClient({
                         <CardContent className="p-6 space-y-6">
                             {/* Box Pendapatan */}
                             <div>
-                                <h4 className="font-semibold text-emerald-600 uppercase mb-3 flex items-center"><Plus className="mr-1 h-4 w-4" /> PENDAPATAN</h4>
+                                <h4 className="font-semibold text-emerald-600 uppercase mb-3 flex items-center text-sm"><Plus className="mr-1 h-3 w-3" /> PENDAPATAN</h4>
                                 {Object.keys(pendapatanByKategori).length === 0 ? (
-                                    <p className="text-muted-foreground text-sm ml-5">Tidak ada data</p>
+                                    <p className="text-muted-foreground text-xs ml-4">Tidak ada data</p>
                                 ) : (
-                                    <div className="space-y-2 ml-5">
+                                    <div className="space-y-2 ml-2 sm:ml-5">
                                         {Object.entries(pendapatanByKategori).map(([k, v]) => (
                                             <div key={k} className="flex justify-between text-sm py-1 border-b border-dashed">
                                                 <span>{k}</span>
@@ -174,11 +176,11 @@ export function LaporanClient({
 
                             {/* Box Pengeluaran */}
                             <div>
-                                <h4 className="font-semibold text-red-500 uppercase mb-3 flex items-center"><Minus className="mr-1 h-4 w-4" /> PENGELUARAN</h4>
+                                <h4 className="font-semibold text-red-500 uppercase mb-3 flex items-center text-sm"><Minus className="mr-1 h-3 w-3" /> PENGELUARAN</h4>
                                 {Object.keys(pengeluaranByKategori).length === 0 ? (
-                                    <p className="text-muted-foreground text-sm ml-5">Tidak ada data</p>
+                                    <p className="text-muted-foreground text-xs ml-4">Tidak ada data</p>
                                 ) : (
-                                    <div className="space-y-2 ml-5">
+                                    <div className="space-y-2 ml-2 sm:ml-5">
                                         {Object.entries(pengeluaranByKategori).map(([k, v]) => (
                                             <div key={k} className="flex justify-between text-sm py-1 border-b border-dashed">
                                                 <span>{k}</span>
