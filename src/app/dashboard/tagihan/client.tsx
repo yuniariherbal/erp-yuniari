@@ -191,7 +191,7 @@ export function TagihanClient({
                             <input type="hidden" name="id" value={editing.id} />
                             <input type="hidden" name="total_tagihan" value={editing.total_tagihan} />
 
-                            <div className="grid grid-cols-2 gap-4">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <div className="space-y-2">
                                     <Label>Nomor Transaksi</Label>
                                     <Input value={editing.nomor_transaksi} disabled />

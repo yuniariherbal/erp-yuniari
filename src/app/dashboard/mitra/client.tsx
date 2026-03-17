@@ -63,13 +63,13 @@ export function MitraClient({ data }: { data: Mitra[] }) {
                     <h1 className="text-2xl font-bold tracking-tight">Mitra / Agen</h1>
                     <p className="text-muted-foreground">Master data reseller, agen, dan maklon</p>
                 </div>
-                <div className="flex gap-2">
-                    <Button variant="outline" size="sm" onClick={handleExport}>
+                <div className="flex flex-wrap gap-2 w-full sm:w-auto">
+                    <Button variant="outline" size="sm" onClick={handleExport} className="flex-1 sm:flex-initial">
                         <Download className="mr-2 h-4 w-4" /> Export
                     </Button>
                     <Dialog open={open} onOpenChange={(v) => { setOpen(v); if (!v) setEditing(null); }}>
                         <DialogTrigger asChild>
-                            <Button size="sm"><Plus className="mr-2 h-4 w-4" /> Mitra Baru</Button>
+                            <Button size="sm" className="flex-1 sm:flex-initial"><Plus className="mr-2 h-4 w-4" /> Mitra Baru</Button>
                         </DialogTrigger>
                         <DialogContent>
                             <DialogHeader>
@@ -80,7 +80,7 @@ export function MitraClient({ data }: { data: Mitra[] }) {
                                     <Label>Nama Lengkap</Label>
                                     <Input name="nama" defaultValue={editing?.nama} placeholder="Nama mitra/toko" required />
                                 </div>
-                                <div className="grid grid-cols-2 gap-4">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                     <div className="space-y-2">
                                         <Label>Kategori</Label>
                                         <Select name="kategori" defaultValue={editing?.kategori || "Reseller"}>

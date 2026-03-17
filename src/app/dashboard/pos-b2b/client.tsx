@@ -144,7 +144,7 @@ export function PosB2BClient({ produkList, mitraList }: { produkList: Produk[], 
     }
 
     return (
-        <div className="flex flex-col lg:flex-row h-[calc(100vh-100px)] gap-6 overflow-hidden">
+        <div className="flex flex-col lg:flex-row lg:h-[calc(100vh-140px)] gap-4 lg:gap-6">
             {/* KIRI - Katalog Produk */}
             <div className="flex-1 flex flex-col h-full bg-white dark:bg-zinc-900 rounded-xl border shadow-sm">
                 <div className="p-4 border-b flex flex-col sm:flex-row gap-3 items-center justify-between">
@@ -314,7 +314,7 @@ export function PosB2BClient({ produkList, mitraList }: { produkList: Produk[], 
                             </div>
 
                             <div className="space-y-4">
-                                <div className="grid grid-cols-2 gap-3 flex-none">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 flex-none">
                                     <div className="space-y-1.5">
                                         <Label className="text-xs">Diskon Spesial (Rp)</Label>
                                         <Input type="number" value={diskonNominal} onChange={(e) => setDiskonNominal(Number(e.target.value) || 0)} placeholder="0" />
@@ -327,7 +327,7 @@ export function PosB2BClient({ produkList, mitraList }: { produkList: Produk[], 
 
                                 <Separator />
 
-                                <div className="grid grid-cols-2 gap-3 flex-none">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 flex-none">
                                     <div className="space-y-1.5">
                                         <Label className="text-xs text-emerald-600">Terbayar / DP Saat Ini (Rp)</Label>
                                         <Input type="number" value={jumlahDibayar} onChange={(e) => setJumlahDibayar(Number(e.target.value) || 0)} placeholder="Biarkan 0 bila kasbon" className="border-emerald-500/50 font-bold focus-visible:ring-emerald-500" />
@@ -341,7 +341,7 @@ export function PosB2BClient({ produkList, mitraList }: { produkList: Produk[], 
                                     </div>
                                 </div>
 
-                                <div className="grid grid-cols-2 gap-3 flex-none">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 flex-none">
                                     <div className="space-y-1.5">
                                         <Label className="text-xs">Jatuh Tempo (Wajib utk DP/Kasbon)</Label>
                                         <Input type="date" value={jatuhTempo} onChange={(e) => setJatuhTempo(e.target.value)} />

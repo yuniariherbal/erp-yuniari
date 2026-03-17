@@ -74,20 +74,20 @@ export function PengeluaranClient({
                     <h1 className="text-2xl font-bold tracking-tight">Pengeluaran</h1>
                     <p className="text-muted-foreground">Kelola semua pengeluaran operasional</p>
                 </div>
-                <div className="flex gap-2">
-                    <Button variant="outline" size="sm" onClick={handleExport}>
+                <div className="flex flex-wrap gap-2 w-full sm:w-auto">
+                    <Button variant="outline" size="sm" onClick={handleExport} className="flex-1 sm:flex-initial">
                         <Download className="mr-2 h-4 w-4" /> Export Excel
                     </Button>
                     <Dialog open={open} onOpenChange={(v) => { setOpen(v); if (!v) setEditing(null); }}>
                         <DialogTrigger asChild>
-                            <Button size="sm"><Plus className="mr-2 h-4 w-4" /> Tambah</Button>
+                            <Button size="sm" className="flex-1 sm:flex-initial"><Plus className="mr-2 h-4 w-4" /> Tambah</Button>
                         </DialogTrigger>
                         <DialogContent>
                             <DialogHeader>
                                 <DialogTitle>{editing ? "Edit" : "Tambah"} Pengeluaran</DialogTitle>
                             </DialogHeader>
                             <form action={handleSubmit} className="space-y-4">
-                                <div className="grid grid-cols-2 gap-4">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                     <div className="space-y-2">
                                         <Label>Tanggal</Label>
                                         <Input type="date" name="tanggal" defaultValue={editing?.tanggal || new Date().toISOString().slice(0, 10)} required />
@@ -101,7 +101,7 @@ export function PengeluaranClient({
                                     <Label>Deskripsi</Label>
                                     <Input name="deskripsi" defaultValue={editing?.deskripsi} placeholder="Deskripsi pengeluaran" required />
                                 </div>
-                                <div className="grid grid-cols-2 gap-4">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                     <div className="space-y-2">
                                         <Label>Kategori</Label>
                                         <Select name="kategori_id" defaultValue={editing?.kategori_id || ""}>

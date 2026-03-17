@@ -121,7 +121,7 @@ export function PosClient({ produkList, kategoriList }: { produkList: Produk[]; 
     }
 
     return (
-        <div className="flex flex-col lg:flex-row h-[calc(100vh-100px)] gap-6 overflow-hidden">
+        <div className="flex flex-col lg:flex-row lg:h-[calc(100vh-140px)] gap-4 lg:gap-6">
             {/* KIRI - Katalog Produk */}
             <div className="flex-1 flex flex-col h-full bg-white dark:bg-zinc-900 rounded-xl border shadow-sm">
                 <div className="p-4 border-b flex flex-col sm:flex-row gap-3 items-center justify-between">
@@ -158,7 +158,7 @@ export function PosClient({ produkList, kategoriList }: { produkList: Produk[]; 
                                         <Label>Nama Barang/Jasa</Label>
                                         <Input name="nama" placeholder="Contoh: Kopi Susu, atau Jasa Service" required />
                                     </div>
-                                    <div className="grid grid-cols-2 gap-4">
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                         <div className="space-y-2">
                                             <Label>Harga Jual (Rp)</Label>
                                             <Input type="number" name="harga" placeholder="0" required />
@@ -168,7 +168,7 @@ export function PosClient({ produkList, kategoriList }: { produkList: Produk[]; 
                                             <Input name="satuan" defaultValue="pcs" placeholder="pcs, porsi, jam" />
                                         </div>
                                     </div>
-                                    <div className="grid grid-cols-2 gap-4">
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                         <div className="space-y-2">
                                             <Label>Stok Awal</Label>
                                             <Input type="number" name="stok" defaultValue={0} placeholder="Bisa diset 0 jika berupa Jasa" />
@@ -239,7 +239,7 @@ export function PosClient({ produkList, kategoriList }: { produkList: Produk[]; 
                                             <Label>Nama Barang/Jasa</Label>
                                             <Input name="nama" placeholder="Contoh: Es Teh" required />
                                         </div>
-                                        <div className="grid grid-cols-2 gap-4">
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                             <div className="space-y-2">
                                                 <Label>Harga Jual (Rp)</Label>
                                                 <Input type="number" name="harga" placeholder="0" required />
@@ -412,7 +412,7 @@ export function PosClient({ produkList, kategoriList }: { produkList: Produk[]; 
                                     <Label>Diskon</Label>
                                     <div className="flex gap-2">
                                         <Select value={diskonType} onValueChange={(val: "nominal" | "persen") => setDiskonType(val)}>
-                                            <SelectTrigger className="w24 h-11">
+                                            <SelectTrigger className="w-20 h-11">
                                                 <SelectValue />
                                             </SelectTrigger>
                                             <SelectContent>

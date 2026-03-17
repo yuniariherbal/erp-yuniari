@@ -69,18 +69,18 @@ export function ProdukClient({ data, kategoriList }: { data: Produk[]; kategoriL
                     <h1 className="text-2xl font-bold tracking-tight">Katalog Produk</h1>
                     <p className="text-muted-foreground">Kelola barang/jasa untuk Point of Sale</p>
                 </div>
-                <div className="flex gap-2">
-                    <Button variant="outline" size="sm" onClick={handleExport}>
+                <div className="flex flex-wrap gap-2 w-full sm:w-auto">
+                    <Button variant="outline" size="sm" onClick={handleExport} className="flex-1 sm:flex-initial">
                         <Download className="mr-2 h-4 w-4" /> Export
                     </Button>
-                    <Link href="/dashboard/produk/kategori">
-                        <Button variant="outline" size="sm">
-                            <ListFilter className="mr-2 h-4 w-4" /> Kelola Kategori
+                    <Link href="/dashboard/produk/kategori" className="flex-1 sm:flex-initial">
+                        <Button variant="outline" size="sm" className="w-full">
+                            <ListFilter className="mr-2 h-4 w-4" /> Kategori
                         </Button>
                     </Link>
                     <Dialog open={open} onOpenChange={(v) => { setOpen(v); if (!v) setEditing(null); }}>
                         <DialogTrigger asChild>
-                            <Button size="sm"><Plus className="mr-2 h-4 w-4" /> Tambah Produk</Button>
+                            <Button size="sm" className="flex-1 sm:flex-initial"><Plus className="mr-2 h-4 w-4" /> Produk</Button>
                         </DialogTrigger>
                         <DialogContent>
                             <DialogHeader>
@@ -91,7 +91,7 @@ export function ProdukClient({ data, kategoriList }: { data: Produk[]; kategoriL
                                     <Label>Nama Barang/Jasa</Label>
                                     <Input name="nama" defaultValue={editing?.nama} placeholder="Contoh: Kopi Susu, atau Jasa Service" required />
                                 </div>
-                                <div className="grid grid-cols-2 gap-4">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                     <div className="space-y-2">
                                         <Label>Harga Jual (Rp)</Label>
                                         <Input type="number" name="harga" defaultValue={editing?.harga} placeholder="0" required />
@@ -101,7 +101,7 @@ export function ProdukClient({ data, kategoriList }: { data: Produk[]; kategoriL
                                         <Input name="satuan" defaultValue={editing?.satuan || "pcs"} placeholder="pcs, porsi, jam" />
                                     </div>
                                 </div>
-                                <div className="grid grid-cols-2 gap-4">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                     <div className="space-y-2">
                                         <Label>Stok Awal</Label>
                                         <Input type="number" name="stok" defaultValue={editing?.stok || 0} placeholder="Bisa diset 0 jika berupa Jasa" />

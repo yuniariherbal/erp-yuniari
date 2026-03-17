@@ -91,13 +91,13 @@ export function PenggajianClient({ data, karyawanList }: { data: Penggajian[]; k
                     <h1 className="text-2xl font-bold tracking-tight">Penggajian</h1>
                     <p className="text-muted-foreground">Kelola slip gaji bulanan karyawan</p>
                 </div>
-                <div className="flex gap-2">
-                    <Button variant="outline" size="sm" onClick={handleExport}>
+                <div className="flex flex-wrap gap-2 w-full sm:w-auto">
+                    <Button variant="outline" size="sm" onClick={handleExport} className="flex-1 sm:flex-initial">
                         <Download className="mr-2 h-4 w-4" /> Export
                     </Button>
                     <Dialog open={open} onOpenChange={(v) => { setOpen(v); if (!v) { setEditing(null); setSelectedKaryawan(""); } }}>
                         <DialogTrigger asChild>
-                            <Button size="sm"><Plus className="mr-2 h-4 w-4" /> Buat Slip Gaji</Button>
+                            <Button size="sm" className="flex-1 sm:flex-initial"><Plus className="mr-2 h-4 w-4" /> Slip Gaji Baru</Button>
                         </DialogTrigger>
                         <DialogContent className="sm:max-w-md">
                             <DialogHeader>
@@ -120,7 +120,7 @@ export function PenggajianClient({ data, karyawanList }: { data: Penggajian[]; k
                                         </SelectContent>
                                     </Select>
                                 </div>
-                                <div className="grid grid-cols-2 gap-4">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                     <div className="space-y-2">
                                         <Label>Bulan</Label>
                                         <Select name="periode_bulan" defaultValue={editing ? String(editing.periode_bulan) : String(new Date().getMonth() + 1)}>
@@ -149,7 +149,7 @@ export function PenggajianClient({ data, karyawanList }: { data: Penggajian[]; k
                                             required
                                         />
                                     </div>
-                                    <div className="grid grid-cols-2 gap-4">
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                         <div className="space-y-2">
                                             <Label>Tunjangan</Label>
                                             <Input type="number" name="tunjangan" defaultValue={editing?.tunjangan || "0"} className="bg-white dark:bg-zinc-900" />

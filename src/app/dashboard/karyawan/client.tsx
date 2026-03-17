@@ -66,13 +66,13 @@ export function KaryawanClient({ data }: { data: Karyawan[] }) {
                     <h1 className="text-2xl font-bold tracking-tight">Karyawan</h1>
                     <p className="text-muted-foreground">Master data karyawan perusahaan</p>
                 </div>
-                <div className="flex gap-2">
-                    <Button variant="outline" size="sm" onClick={handleExport}>
+                <div className="flex flex-wrap gap-2 w-full sm:w-auto">
+                    <Button variant="outline" size="sm" onClick={handleExport} className="flex-1 sm:flex-initial">
                         <Download className="mr-2 h-4 w-4" /> Export
                     </Button>
                     <Dialog open={open} onOpenChange={(v) => { setOpen(v); if (!v) setEditing(null); }}>
                         <DialogTrigger asChild>
-                            <Button size="sm"><Plus className="mr-2 h-4 w-4" /> Karyawan Baru</Button>
+                            <Button size="sm" className="flex-1 sm:flex-initial"><Plus className="mr-2 h-4 w-4" /> Karyawan Baru</Button>
                         </DialogTrigger>
                         <DialogContent>
                             <DialogHeader>
@@ -83,7 +83,7 @@ export function KaryawanClient({ data }: { data: Karyawan[] }) {
                                     <Label>Nama Lengkap</Label>
                                     <Input name="nama" defaultValue={editing?.nama} placeholder="Nama lengkap karyawan" required />
                                 </div>
-                                <div className="grid grid-cols-2 gap-4">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                     <div className="space-y-2">
                                         <Label>Email</Label>
                                         <Input type="email" name="email" defaultValue={editing?.email || ""} placeholder="Email" />
@@ -93,7 +93,7 @@ export function KaryawanClient({ data }: { data: Karyawan[] }) {
                                         <Input name="telepon" defaultValue={editing?.telepon || ""} placeholder="Nomor telepon/WA" />
                                     </div>
                                 </div>
-                                <div className="grid grid-cols-2 gap-4">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                     <div className="space-y-2">
                                         <Label>Kategori / Role</Label>
                                         <Select name="posisi" defaultValue={editing?.posisi || "Karyawan"}>
@@ -115,7 +115,7 @@ export function KaryawanClient({ data }: { data: Karyawan[] }) {
                                         </Select>
                                     </div>
                                 </div>
-                                <div className="grid grid-cols-2 gap-4">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                     <div className="space-y-2">
                                         <Label>Gaji Pokok (Bila Tetap, Rp)</Label>
                                         <Input type="number" name="gaji_pokok" defaultValue={editing?.gaji_pokok || 0} placeholder="0" />
